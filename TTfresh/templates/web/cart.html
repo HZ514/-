@@ -60,7 +60,7 @@
 	<li class="col01"><input class="is_all" type="checkbox" name="" checked="" onclick="all_select();"></li>
 	<li class="col02">全选</li>
     <!-- 总订单金额 -->
-	<li class="col03">合计(不含运费)：<span>¥</span><em id="moneys">{{ moneys }}</em><br>共计<b>{{ count }}</b>件商品</li>
+	<li class="col03">合计(不含运费)：<span>¥</span><em id="moneys">{{ moneys }}</em><br>共计<b id="all_count">{{ count }}</b>件商品</li>
 	<li class="col04"><a href="{% url 'home:place_order' %}">去结算</a></li>
 </ul>
 

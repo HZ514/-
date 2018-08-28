@@ -17,7 +17,9 @@ def index(request):
     if request.method == 'GET':
         sides = MainSide.objects.all()
         types = FoodType.objects.all()
+        c_count = Cart.objects.all().count()
         data = {
+            'c_count':c_count,
             'sides': sides,
             'types':types,
         }
@@ -174,12 +176,12 @@ def my_cart(request):
     if request.method == 'GET':
         user = request.user
         if user:
-            carts = Cart.objects.all()
-            count = carts.count
+            is_select_carts = Cart.objects.filter(is_select=1)
+            count = is_select_carts.count
 
             carts = Cart.objects.all()
             moneys = 0
-            for cart in carts:
+            for cart in is_select_carts:
                 moneys += cart.c_prices
             data = {
                 'carts': carts,
@@ -215,18 +217,33 @@ def is_select(request):
         cart_id = request.POST.get('cart_id')
         # cart_id = int(request.POST.get('select'))
         cart = Cart.objects.get(id=cart_id)
+        # 如果返回的商品的is_select为1,则将其修改为0，如果为0.则将其修改为1，并且将修改后的购物车的总金额统计
         if cart.is_select:
             cart.is_select = 0
             cart.save()
+            carts = Cart.objects.filter(is_select=1)
+            all_count = carts.count()
+            moneys = 0
+            for cart in carts:
+                moneys += cart.c_prices
         else:
             cart.is_select = 1
             cart.save()
-        if Cart.objects.filter(is_select=0).exists():
-            all_select = 0
-        else:
-            all_select = 1
+            carts = Cart.objects.filter(is_select=1)
+            all_count = carts.count()
+            moneys = 0
+            for cart in carts:
+                moneys += cart.c_prices
 
-        data['all_select'] = all_select
+        data['moneys'] = moneys
+        data['all_count'] = all_count
+
+        if Cart.objects.filter(is_select=0).exists():
+            is_all_select = 0
+        else:
+            is_all_select = 1
+
+        data['all_select'] = is_all_select
 
         return JsonResponse(data)
 

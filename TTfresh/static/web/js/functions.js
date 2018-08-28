@@ -88,8 +88,12 @@ function is_selcet(cart_id){
            console.log(data)
            if (data.all_select){
                $('.is_all')[0].checked = true
+               $('#moneys').html(data.moneys)
+               $('#all_count').text(data.all_count)
            }else{
                $('.is_all')[0].checked = false
+               $('#moneys').html(data.moneys)
+               $('#all_count').text(data.all_count)
            }
 
             },
