@@ -1,0 +1,65 @@
+{% extends 'backweb/base_main.html' %}
+
+{% block title %}
+    后台管理系统
+{% endblock %}
+
+{% load static %}
+{% block Jsq %}
+<script src="{% static 'backweb/js/html5.js' %}"></script>
+<script src="{% static 'backweb/js/jquery.js' %}"></script>
+<script src="{% static 'backweb/js/jquery.mCustomScrollbar.concat.min.js' %}"></script>
+{% endblock %}
+
+
+{% block content %}
+<style>
+.dataStatistic{width:400px;height:200px;border:1px solid #ccc;margin:0 auto;margin:10px;overflow:hidden}
+#cylindrical{width:400px;height:200px;margin-top:-15px}
+#line{width:400px;height:200px;margin-top:-15px}
+#pie{width:400px;height:200px;margin-top:-15px}
+</style>
+<section class="rt_wrap content mCustomScrollbar">
+<form action="" method="post">
+    {% csrf_token %}
+ <div class="rt_content">
+
+      <table class="table">
+       <tr>
+            <th>用户</th>
+            <th>角色</th>
+       </tr>
+       <tr>
+            <th>
+                <select name="uu">
+                    {% for u in user %}
+                        <option value="{{ u.username }}">{{ u.username }}</option>
+                    {% endfor %}
+                </select>
+
+            </th>
+            <th>
+                <select name="rr">
+                    {% for r in role %}
+                            <option value="{{ r.r_name }}">{{ r.r_name }}</option>
+                    {% endfor %}
+                </select>
+            </th>
+       </tr>
+
+      </table>
+     <table align="center">
+         <tr>
+              <th >
+                  <input class="input" type="submit" value="提交" align="center" style="font-size:15px;height:40px;width:100px;border:none;outline:none;background-color:rgb(111,111,111)">
+              </th>
+          </tr>
+     </table>
+
+
+ </div>
+</form>
+
+</section>
+{% endblock %}
+

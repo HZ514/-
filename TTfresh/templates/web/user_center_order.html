@@ -1,0 +1,84 @@
+{% extends 'web/base.html' %}
+
+{% block title %}
+天天生鲜-用户中心
+{% endblock %}
+
+{% block counter %}
+{% load static %}
+<div class="search_bar clearfix">
+	<a href="{% url 'home:index' %}" class="logo fl"><img src="/static/web/images/logo.png"></a>
+	<div class="sub_page_name fl">|&nbsp;&nbsp;&nbsp;&nbsp;用户中心</div>
+	<div class="search_con fr">
+		<input type="text" class="input_text fl" name="" placeholder="搜索商品">
+		<input type="button" class="input_btn fr" name="" value="搜索">
+	</div>
+</div>
+
+<div class="main_con clearfix">
+	<div class="left_menu_con clearfix">
+		<h3>用户中心</h3>
+		<ul>
+			<li><a href="{% url 'home:userInfo' %}">· 个人信息</a></li>
+			<li><a href="{% url 'home:order_show' %}" class="active">· 全部订单</a></li>
+			<li><a href="{% url 'home:user_site' %}">· 收货地址</a></li>
+		</ul>
+	</div>
+	<div class="right_content clearfix">
+			<h3 class="common_title2">全部订单</h3>
+
+			{% for order in page %}
+			<ul class="order_list_th w978 clearfix">
+				<li class="col01">{{ order.order_time | date:'Y-m-d h:m:s'}}</li>
+				<li class="col02">订单号：{{ order.order_id }}</li>
+                {% if order.order_status == 0 %}
+				<li class="col02 stress">未支付</li>
+                {% else %}
+                <li class="col02 stress">已支付</li>
+                {% endif %}
+			</ul>
+
+			<table class="order_list_table w980">
+				<tbody>
+					<tr>
+						<td width="55%">
+                            {% for goods in order.ordergoodsmodel_set.all %}
+							<ul class="order_goods_list clearfix">
+								<li class="col01"><img src="/static/web/images/goods/{{ goods.goods.productimg }}"></li>
+								<li class="col02">{{ goods.goods.productname }}<em>{{ goods.goods.price }}元/{{ goods.goods.one_weight }}</em></li>
+								<li class="col03">{{ goods.goods_num }}</li>
+								<li class="col04">{{ goods.goods_price }}元</li>
+							</ul>
+                            {% endfor %}
+
+						</td>
+						<td width="15%">{{ order.o_prices }}元</td>
+                        {% if order.order_status == 0 %}
+						<td width="15%">待付款</td>
+						<td width="15%"><a href="#" class="oper_btn">去付款</a></td>
+                        {% else %}
+                        <td width="15%">已付款</td>
+						<td width="15%"><a href="#" class="oper_btn">查看物流</a></td>
+                        {% endif %}
+					</tr>
+				</tbody>
+			</table>
+			{% endfor %}
+
+
+
+			<div class="pagenation">
+                {% if page.has_previous == True %}
+                <a href="{% url 'home:order_show' %}?page={{ page.previous_page_number }}"><上一页</a>
+                {% endif %}
+                {% for i in page.paginator.page_range %}
+                <a href="{% url 'home:order_show' %}?page={{ i }}" class="active">{{ i }}</a>
+                {% endfor %}
+                {% if page.has_next == True %}
+                <a href="{% url 'home:list' %}?page={{ page.next_page_number }}">下一页></a>
+                {% endif %}
+			</div>
+	</div>
+</div>
+{% endblock %}
+

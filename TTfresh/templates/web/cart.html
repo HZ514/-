@@ -1,0 +1,84 @@
+{% extends 'web/base.html' %}
+
+{% block title %}
+天天生鲜-购物车
+{% endblock %}
+
+{% block cssjs%}
+{% load static %}
+<script type="text/javascript" src="{% static 'web/js/functions.js' %}"></script>
+{% endblock %}
+
+
+{% block counter %}
+{% csrf_token %}
+<div class="search_bar clearfix">
+	<a href="{% url 'home:index' %}" class="logo fl"><img src="/static/web/images/logo.png"></a>
+	<div class="sub_page_name fl">|&nbsp;&nbsp;&nbsp;&nbsp;购物车</div>
+	<div class="search_con fr">
+		<input type="text" class="input_text fl" name="" placeholder="搜索商品">
+		<input type="button" class="input_btn fr" name="" value="搜索">
+	</div>
+</div>
+
+<div class="total_count">全部商品<em>{{ count }}</em>件</div>
+<ul class="cart_list_th clearfix">
+	<li class="col01">商品名称</li>
+	<li class="col02">商品单位</li>
+	<li class="col03">商品价格</li>
+	<li class="col04">数量</li>
+	<li class="col05">小计</li>
+	<li class="col06">操作</li>
+</ul>
+{% for cart in carts %}
+<ul class="cart_list_td clearfix" id="cart_{{ cart.id }}">
+    {% if cart.is_select %}
+	<li class="col01"><input value="{{ cart.id }}" class="is_{{ cart.id }}" type="checkbox" name="box" checked onclick="is_selcet({{ cart.id }})"></li>
+    {% else %}
+    <li class="col01"><input value="{{ cart.id }}" class="is_{{ cart.id }}" type="checkbox" name="box" onclick="is_selcet({{ cart.id }});"></li>
+    {% endif %}
+
+	<li class="col02"><img src="/static/web/images/goods/{{ cart.goods.productimg }}"></li>
+	<li class="col03">{{ cart.goods.productname }}<br><em>{{ cart.goods.price }}元/{{ cart.goods.one_weight }}</em></li>
+	<li class="col04">{{ cart.goods.one_weight }}</li>
+	<li class="col05">{{ cart.goods.price }}元</li>
+	<li class="col06">
+		<div class="num_add">
+			<a href="javascript:;" class="add fl" onclick="add_goods_num({{ cart.id }})">+</a>
+			<input type="text" id="c_d_{{ cart.id }}" class="num_show fl" value="{{ cart.c_num }}">
+			<a href="javascript:;" class="minus fl" onclick="reduct_good_num({{ cart.id }})">-</a>
+		</div>
+	</li>
+    <!-- 物品价格 -->
+	<li class="col07" id="c_price_{{ cart.id }}">{{ cart.c_prices }}元</li>
+	<li class="col08"><a href="javascript:;" onclick="delete_cart({{ cart.id }});">删除</a></li>
+</ul>
+{% endfor %}
+
+
+<ul class="settlements">
+	<li class="col01"><input class="is_all" type="checkbox" name="" checked="" onclick="all_select();"></li>
+	<li class="col02">全选</li>
+    <!-- 总订单金额 -->
+	<li class="col03">合计(不含运费)：<span>¥</span><em id="moneys">{{ moneys }}</em><br>共计<b>{{ count }}</b>件商品</li>
+	<li class="col04"><a href="{% url 'home:place_order' %}">去结算</a></li>
+</ul>
+
+
+<script type="text/javascript">
+// 刚进页面是否全选
+$.get('/home/is_all_o/',function(data){
+    if (data.code == '200'){
+
+        if (data.status == '0'){
+        console.log(data)
+             $('.is_all')[0].checked = false
+        }else{
+             $('.is_all')[0].checked = true
+        }
+    }
+
+})
+</script>
+{% endblock %}
+

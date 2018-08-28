@@ -1,0 +1,143 @@
+{% extends 'web/base.html' %}
+
+{% block title %}
+天天生鲜-商品详情
+{% endblock %}
+
+{% block cssjs%}
+{% load static %}
+<script type="text/javascript" src="{% static 'web/js/functions.js' %}"></script>
+{% endblock %}
+
+
+{% block counter %}
+<div class="search_bar clearfix">
+    <a href="{% url 'home:index' %}" class="logo fl"><img src="/static/web/images/logo.png"></a>
+    <div class="search_con fl">
+        <input type="text" class="input_text fl" name="" placeholder="搜索商品">
+        <input type="button" class="input_btn fr" name="" value="搜索">
+    </div>
+    <div class="guest_cart fr">
+        <a href="{% url 'home:my_cart' %}" class="cart_name fl">我的购物车</a>
+        <div class="goods_count fl" id="show_count">{{ c_count }}</div>
+    </div>
+</div>
+
+<div class="navbar_con">
+    <div class="navbar clearfix">
+        <div class="subnav_con fl">
+            <h1>全部商品分类</h1>
+            <span></span>
+            <ul class="subnav">
+                <li><a href="{% url 'home:list' %}?type={{ types.0.typename }}" class="fruit">新鲜水果</a></li>
+                <li><a href="{% url 'home:list' %}?type={{ types.1.typename }}" class="seafood">海鲜水产</a></li>
+                <li><a href="{% url 'home:list' %}?type={{ types.2.typename }}" class="meet">猪牛羊肉</a></li>
+                <li><a href="{% url 'home:list' %}?type={{ types.3.typename }}" class="egg">禽类蛋品</a></li>
+                <li><a href="{% url 'home:list' %}?type={{ types.4.typename }}" class="vegetables">新鲜蔬菜</a></li>
+                <li><a href="{% url 'home:list' %}?type={{ types.5.typename }}" class="ice">速冻食品</a></li>
+            </ul>
+        </div>
+        <ul class="navlist fl">
+            <li><a href="">首页</a></li>
+            <li class="interval">|</li>
+            <li><a href="">手机生鲜</a></li>
+            <li class="interval">|</li>
+            <li><a href="">抽奖</a></li>
+        </ul>
+    </div>
+</div>
+
+<div class="breadcrumb">
+    <a href="#">全部分类</a>
+    <span>></span>
+    <a href="#">{{ typename }}</a>
+    <span>></span>
+    <a href="#">商品详情</a>
+</div>
+{% csrf_token %}
+<div class="goods_detail_con clearfix">
+    <div class="goods_detail_pic fl"><img src="/static/web/images/goods/{{ good.productimg }}"></div>
+
+    <div class="goods_detail_list fr">
+        <h3>{{ good.productname }}</h3>
+        <p>{{ good.pmdesc }}</p>
+        <div class="prize_bar">
+            <span class="show_pirze">¥<em>{{ good.price }}</em></span>
+            <span class="show_unit">单  位：{{ good.one_weight }}</span>
+        </div>
+        <div class="goods_num clearfix">
+            <div class="num_name fl">数 量：</div>
+            <div class="num_add fl">
+                <input type="text" id="num_{{ good.id }}" class="num_show fl" value="1">
+
+                <a href="javascript:;" class="add fr" onclick="add_product({{ good.id }});">+</a>
+                <a href="javascript:;" class="minus fr" onclick="reduce_product({{ good.id }});">-</a>
+            </div>
+        </div>
+        <div class="total">总价：<em>{{ good.price }}元</em></div>
+        <div class="operate_btn">
+            <a href="javascript:;" class="buy_btn">立即购买</a>
+            <a href="javascript:;" class="add_cart" id="add_cart" onclick="add_cart({{ good.id }});">加入购物车</a>
+        </div>
+    </div>
+</div>
+
+<div class="main_wrap clearfix">
+    <div class="l_wrap fl clearfix">
+        <div class="new_goods">
+            <h3>新品推荐</h3>
+            <ul>
+                {% for good in new_goods %}
+                {% if forloop.counter > 0 and forloop.counter < 3 %}
+                <li>
+                    <a href="{% url 'home:detail' %}?type={{ typename }}&product_id={{ good.id }}"><img src="/static/web/images/goods/{{ good.productimg }}"></a>
+                    <h4><a href="{% url 'home:detail' %}?type={{ typename }}&product_id={{ good.id }}">{{ good.productname }}</a></h4>
+                    <div class="prize">￥{{ good.price }}</div>
+                </li>
+                {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="r_wrap fr clearfix">
+        <ul class="detail_tab clearfix">
+            <li class="active">商品介绍</li>
+            <li>评论</li>
+        </ul>
+
+        <div class="tab_content">
+            <dl>
+                <dt>商品详情：</dt>
+                <dd>{{ good.detail }}</dd>
+            </dl>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block popup_con %}
+<div class="add_jump"></div>
+<script type="text/javascript" src="js/jquery-1.12.2.js"></script>
+<script type="text/javascript">
+    var $add_x = $('#add_cart').offset().top;
+    var $add_y = $('#add_cart').offset().left;
+
+    var $to_x = $('#show_count').offset().top;
+    var $to_y = $('#show_count').offset().left;
+
+    $(".add_jump").css({'left':$add_y+80,'top':$add_x+10,'display':'block'})
+    $('#add_cart').click(function(){
+        $(".add_jump").stop().animate({
+            'left': $to_y+7,
+            'top': $to_x+7},
+            "fast", function() {
+                $(".add_jump").fadeOut('fast',function(){
+
+                });
+
+        });
+    })
+</script>
+{% endblock %}

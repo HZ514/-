@@ -1,0 +1,103 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+{% load static %}
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	{% load static  %}
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <meta charset="UTF-8">
+    <title>
+        {% block title %}
+        {% endblock %}
+    </title>
+    <style>
+        /* 把标签默认的间距设为0 */
+        body,ul,ol,p,h1,h2,h3,h4,h5,h6,dl,dd,select,input,textarea,form{margin:0;padding:0}
+
+        /* 让h标签文字大小继承body的文字设置 */
+        h1,h2,h3,h4,h5,h6{font-size:100%;font-weight:normal;}
+
+        /* 去掉列表默认的图标 */
+        ul,ol{list-style:none;}
+
+        /* 去掉em默认的斜体 */
+        em{font-style: normal;}
+
+        /* 去掉a标签默认的下划线 */
+        a{text-decoration:none;}
+
+
+        /* 去掉加链接时产生的框线 */
+        img{border:0;}
+
+        /* 清除浮动 */
+        .clearfix:before,.clearfix:after{content:"";display:table}
+        .clearfix:after{clear:both;}
+        .clearfix{zoom:1}
+
+        /* 浮动 */
+        .fl{float:left}
+        .fr{float:right}
+    </style>
+	<link rel="stylesheet" type="text/css" href="{% static 'web/css/main.css' %}">
+	<script type="text/javascript" src="{% static 'web/js/jquery-1.12.4.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'web/js/register.js' %}"></script>
+	<script type="text/javascript" src="{% static 'web/js/jquery-ui.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'web/js/slide.js' %}"></script>
+    {% block cssjs%}
+    {% endblock %}
+</head>
+<body>
+
+{% block head %}
+<div class="header_con">
+		<div class="header">
+			<div class="welcome fl">欢迎来到天天生鲜!</div>
+			<div class="fr">
+
+				<div class="login_btn fl">
+                    {% if not user.id %}
+					<a href="{% url 'user:login' %}">登录</a>
+					<span>|</span>
+					<a href="{% url 'user:register' %}">注册</a>
+					{% else %}
+                    欢迎您：<em>{{ user.u_name }}</em>
+                    <span>|</span>
+					<a href="{% url 'user:logout' %}">退出</a>
+                    {% endif %}
+				</div>
+				<div class="user_link fl">
+					<span>|</span>
+					<a href="{% url 'home:userInfo' %}">用户中心</a>
+					<span>|</span>
+					<a href="{% url 'home:my_cart' %}">我的购物车</a>
+					<span>|</span>
+					<a href="{% url 'home:order_show' %}">我的订单</a>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+
+{% block counter %}
+{% endblock %}
+
+{% block botton %}
+<div class="footer">
+    <div class="foot_link">
+        <a href="#">关于我们</a>
+        <span>|</span>
+        <a href="#">联系我们</a>
+        <span>|</span>
+        <a href="#">招聘人才</a>
+        <span>|</span>
+        <a href="#">友情链接</a>
+    </div>
+    <p>CopyRight © 2016 北京天天生鲜信息技术有限公司 All Rights Reserved</p>
+    <p>电话：010-****888    京ICP备*******8号</p>
+</div>
+{% endblock %}
+
+{% block popup_con %}
+{% endblock %}
+</body>
+</html>

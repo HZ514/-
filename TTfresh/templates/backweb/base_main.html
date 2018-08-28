@@ -1,0 +1,50 @@
+{% extends 'backweb/base.html' %}
+
+{% block header %}
+<header>
+ <h1><img src="/static/backweb/images/admin_logo.png"/></h1>
+  <ul class="rt_nav">
+  <li><a href="" target="_blank" class="website_icon">站点首页</a></li>
+  <li><a href="#" class="set_icon">账号设置</a></li>
+  <li><a href="{% url 'backweb:logout' %}" class="quit_icon">安全退出</a></li>
+ </ul>
+</header>
+{% endblock %}
+
+{% block left_content %}
+<aside class="lt_aside_nav content mCustomScrollbar">
+ <h2><a href="index.html">起始页</a></h2>
+ <ul>
+  <li>
+   <dl>
+    {% if not 'look' not in user.authority %}
+    <dt>商品管理</dt>
+    {% endif %}
+    <!--当前链接则添加class:active-->
+    <dd><a href="{% url 'backweb:index' %}" class="active">商品列表</a></dd>
+    <dd><a href="{% url 'backweb:index' %}" class="active">幻灯片列表</a></dd>
+    <dd><a href="{% url 'backweb:type_manage' %}" class="active">分类列表</a></dd>
+   </dl>
+  </li>
+
+  <li>
+    {% if user.is_superuser %}
+    <dl>
+    <dt>商品添加</dt>
+
+    <dd><a href="{% url 'backweb:add_side' %}">幻灯片添加</a></dd>
+    <dd><a href="{% url 'backweb:add_type' %}">商品分类添加</a></dd>
+    <dd><a href="{% url 'backweb:add_product' %}">商品添加</a></dd>
+   </dl>
+   <dl>
+    <dt>用户管理</dt>
+
+    <dd><a href="{% url 'backweb:listUser' %}">用户列表</a></dd>
+    <dd><a href="{% url 'backweb:update_postwd' %}">修改密码</a></dd>
+   </dl>
+   {% endif %}
+  </li>
+
+ </ul>
+</aside>
+{% endblock %}

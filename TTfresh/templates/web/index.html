@@ -1,0 +1,95 @@
+{% extends 'web/base.html' %}
+
+{% block title %}
+天天生鲜-首页
+{% endblock %}
+
+
+{% block counter %}
+{% load static %}
+<div class="search_bar clearfix">
+    <a href="index.html" class="logo fl"><img src="{% static 'web/images/logo.png' %}"></a>
+    <div class="search_con fl">
+
+        <input type="text" class="input_text fl" name="" placeholder="搜索商品">
+        <input type="button" class="input_btn fr" name="" value="搜索">
+    </div>
+    <div class="guest_cart fr">
+        <a href="{% url 'home:my_cart' %}" class="cart_name fl">我的购物车</a>
+        <div class="goods_count fl" id="show_count">1</div>
+    </div>
+</div>
+
+<div class="navbar_con">
+    <div class="navbar">
+        <h1 class="fl">全部商品分类</h1>
+        <ul class="navlist fl">
+            <li><a href="">首页</a></li>
+            <li class="interval">|</li>
+            <li><a href="">手机生鲜</a></li>
+            <li class="interval">|</li>
+            <li><a href="">抽奖</a></li>
+        </ul>
+    </div>
+</div>
+
+<div class="center_con clearfix">
+    <ul class="subnav fl">
+        {% for type in types %}
+        <li><a href="{% url 'home:list' %}?type={{ type.typename }}" class="fruit">{{ type.typename }}</a></li>
+        {% endfor %}
+    </ul>
+    <div class="slide fl">
+        <ul class="slide_pics">
+            {% for side in sides %}
+            <li><img src="/static/web/images/{{ side.img }}" alt="幻灯片"></li>
+            {% endfor %}
+        </ul>
+        <div class="prev"></div>
+        <div class="next"></div>
+        <ul class="points"></ul>
+    </div>
+    <div class="adv fl">
+        <a href="#"><img src="{% static 'web/images/adv01.jpg' %}"></a>
+        <a href="#"><img src="{% static 'web/images/adv02.jpg' %}"></a>
+    </div>
+</div>
+
+
+{% for type in types %}
+<div class="list_model">
+    <div class="list_title clearfix">
+        <h3 class="fl" id="model01">{{ type.typename }}</h3>
+
+        <div class="subtitle fl">
+            <span>|</span>
+            {% for type_recommend in type.typerecommend_set.all %}
+            <a href="#">{{ type_recommend.recommend_name }}</a>
+            {% endfor %}
+        </div>
+
+        <a href="#" class="goods_more fr" id="fruit_more">查看更多 ></a>
+    </div>
+
+    <div class="goods_con clearfix">
+        <div class="goods_banner fl"><img src="/static/web/images/{{ type.type_img }}"></div>
+
+        <ul class="goods_list fl">
+            {% for good in type.goods_set.all %}
+            {% if forloop.counter > 0 and forloop.counter < 5 %}
+            <li>
+                <h4><a href="{% url 'home:detail' %}?type={{ type.typename }}&product_id={{ good.id }}">{{ good.productname }}</a></h4>
+                <a href="{% url 'home:detail' %}?type={{ type.typename }}&product_id={{ good.id }}"><img src="/static/web/images/goods/{{ good.productimg }}"></a>
+                <div class="prize">{{ good.price }}</div>
+            </li>
+            {% endif %}
+            {% endfor %}
+
+        </ul>
+    </div>
+</div>
+{% endfor %}
+
+
+
+{% endblock %}

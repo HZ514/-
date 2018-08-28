@@ -1,0 +1,82 @@
+{% extends 'backweb/base_main.html' %}
+
+{% block title %}
+    后台管理系统
+{% endblock %}
+
+{% load static %}
+{% block Jsq %}
+<script src="{% static 'backweb/js/html5.js' %}"></script>
+
+<script src="{% static 'backweb/js/jquery.js' %}"></script>
+<script src="{% static 'backweb/js/jquery.mCustomScrollbar.concat.min.js' %}"></script>
+<script>
+
+	(function($){
+		$(window).load(function(){
+
+			$("a[rel='load-content']").click(function(e){
+				e.preventDefault();
+				var url=$(this).attr("href");
+				$.get(url,function(data){
+					$(".content .mCSB_container").append(data); //load new content inside .mCSB_container
+					//scroll-to appended content
+					$(".content").mCustomScrollbar("scrollTo","h2:last");
+				});
+			});
+
+			$(".content").delegate("a[href='top']","click",function(e){
+				e.preventDefault();
+				$(".content").mCustomScrollbar("scrollTo",$(this).attr("href"));
+			});
+
+		});
+	})(jQuery);
+</script>
+{% endblock %}
+
+
+
+{% block content %}
+<section class="rt_wrap content mCustomScrollbar">
+ <div class="rt_content">
+      <div class="page_title">
+       <h2 class="fl">幻灯片</h2>
+      </div>
+     <form method="post" action="" enctype="multipart/form-data">
+     {%csrf_token%}
+     <section>
+      <ul class="ulColumn2">
+       <!--<li>-->
+        <!--<span class="item_name" style="width:120px;"></span>-->
+        <!--<input name="title" type="text" class="textbox textbox_295" placeholder=""/>-->
+
+       <!--</li>-->
+       <li>
+        <span class="item_name" style="width:120px;">图片描述</span>
+        <input name="side_name" type="text" class="textbox" placeholder="图片描述"/>
+       </li>
+
+       <li>
+        <span class="item_name" style="width:120px;">图片</span>
+        <label class="uploadImg">
+         <input name="img" type="file"/>
+         <span>上传图片</span>
+        </label>
+       </li>
+       <li>
+
+       </li>
+       <li>
+        <span class="item_name" style="width:120px;"></span>
+        <input type="submit" class="link_btn"/>
+       </li>
+      </ul>
+     </section>
+     </form>
+ </div>
+</section>
+{% load static %}
+<script src="{% static 'backweb/js/ueditor.config.js' %}"></script>
+<script src="{% static 'backweb/js/ueditor.all.min.js' %}"> </script>
+{% endblock %}

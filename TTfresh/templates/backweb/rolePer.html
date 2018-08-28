@@ -1,0 +1,56 @@
+{% extends 'backweb/base_main.html' %}
+
+{% block title %}
+    添加用户界面
+{% endblock %}
+
+{% load static %}
+{% block Jsq %}
+<script src="{% static 'backweb/js/html5.js' %}"></script>
+
+<script src="{% static 'backweb/js/jquery.js' %}"></script>
+<script src="{% static 'backweb/js/jquery.mCustomScrollbar.concat.min.js' %}"></script>
+<script>
+
+	(function($){
+		$(window).load(function(){
+
+			$("a[rel='load-content']").click(function(e){
+				e.preventDefault();
+				var url=$(this).attr("href");
+				$.get(url,function(data){
+					$(".content .mCSB_container").append(data); //load new content inside .mCSB_container
+					//scroll-to appended content
+					$(".content").mCustomScrollbar("scrollTo","h2:last");
+				});
+			});
+
+			$(".content").delegate("a[href='top']","click",function(e){
+				e.preventDefault();
+				$(".content").mCustomScrollbar("scrollTo",$(this).attr("href"));
+			});
+
+		});
+	})(jQuery);
+</script>
+{% endblock %}
+
+{% block header %}
+{% endblock %}
+
+
+{% block left_content %}
+{% endblock %}
+
+{% block content %}
+<form action="" method="post">
+    {%csrf_token%}
+    <input type="text" name="role" placeholder="请输入角色名" >
+    {% for r in userPer %}
+    <input type="checkbox" name="per" value="{{ r.p_name }}">{{ r.p_name }}
+    {% endfor %}
+    <br>
+    <input type="submit">
+
+</form>
+{% endblock %}

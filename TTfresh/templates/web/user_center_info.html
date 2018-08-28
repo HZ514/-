@@ -1,0 +1,59 @@
+{% extends 'web/base.html' %}
+
+{% block title %}
+天天生鲜-用户中心
+{% endblock %}
+
+{% block counter %}
+{% load static %}
+<div class="search_bar clearfix">
+    <a href="{% url 'home:index' %}" class="logo fl"><img src="/static/web/images/logo.png"></a>
+    <div class="sub_page_name fl">|&nbsp;&nbsp;&nbsp;&nbsp;用户中心</div>
+    <div class="search_con fr">
+        <input type="text" class="input_text fl" name="" placeholder="搜索商品">
+        <input type="button" class="input_btn fr" name="" value="搜索">
+    </div>
+</div>
+
+<div class="main_con clearfix">
+    <div class="left_menu_con clearfix">
+        <h3>用户中心</h3>
+        <ul>
+            <li><a href="{% url 'home:userInfo' %}" class="active">· 个人信息</a></li>
+            <li><a href="{% url 'home:order_show' %}">· 全部订单</a></li>
+            <li><a href="{% url 'home:user_site' %}">· 收货地址</a></li>
+        </ul>
+    </div>
+    <div class="right_content clearfix">
+            <div class="info_con clearfix">
+            <h3 class="common_title2">基本信息</h3>
+                    <ul class="user_info_list">
+                        <li><span>用户名：</span>{{ user.username }}</li>
+                        <li><span>联系方式：</span>{{ user.userphone }}</li>
+                        <li><span>联系地址：</span>{{ user.useraddress }}</li>
+                    </ul>
+            </div>
+
+            <h3 class="common_title2">最近浏览</h3>
+            <div class="has_view_list">
+                <ul class="goods_type_list clearfix">
+            {% for userbrowse in userbrowses%}
+            <li>
+                <a href="{% url 'home:detail' %}?type={{ userbrowse.good.goods_type.typename }}&product_id={{ userbrowse.good.id }}""><img src="/static/web/images/goods/{{ userbrowse.good.productimg }}"></a>
+                <h4><a href="{% url 'home:detail' %}?type={{ userbrowse.good.goods_type.typename }}&product_id={{ userbrowse.good.id }}">{{ userbrowse.good.productname }}</a></h4>
+                <div class="operate">
+                    <span class="prize">￥{{ userbrowse.good.price }}</span>
+                    <span class="unit">{{ userbrowse.good.price }}/{{ userbrowse.good.one_weight }}</span>
+                    <a href="#" class="add_goods" title="加入购物车"></a>
+                </div>
+            </li>
+            {% endfor %}
+
+
+        </ul>
+    </div>
+    </div>
+</div>
+{% endblock %}
+
+
