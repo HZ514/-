@@ -121,11 +121,15 @@ function all_select(){
 
                         $('.is_' + data.carts_id[i])[0].checked = true
                     }
+                $('#moneys').html(data.moneys)
+                $('#all_count').text(data.all_count)
                 }else{
                     for (var i = 0; i < data.carts_id.length; i++){
                         $('.is_' + data.carts_id[i])[0].checked = false
                     }
                 }
+                $('#moneys').html(data.moneys)
+                $('#all_count').text(data.all_count)
             },
         error:function(data){
             alert('请求失败')

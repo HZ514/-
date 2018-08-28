@@ -254,13 +254,22 @@ def all_select(request):
     if request.method == 'POST':
         data = {}
         is_all = request.POST.get('is_all')
+        moneys = 0
+        all_count = 0
         if is_all == 'true':
             Cart.objects.update(is_select=1)
+            carts = Cart.objects.all()
+            all_count = carts.count()
+            for cart in carts:
+                moneys = cart.c_prices
             f_is_all = 1
         else:
             Cart.objects.update(is_select=0)
             f_is_all = 0
         data['f_is_all'] =f_is_all
+        data['moneys'] = moneys
+        data['all_count'] = all_count
+
         # 返回全部的购物车数据
         carts_id = []
         for cart in Cart.objects.all():
