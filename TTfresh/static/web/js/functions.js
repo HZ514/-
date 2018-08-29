@@ -204,25 +204,6 @@ function delete_cart(cart_id){
     $('#cart_' + cart_id).remove()
 }
 
-//
-//// 提交订单
-//function place_oder(){
-//
-//    $.ajax({
-//        url:'/home/place_oder/',
-//        type:'GET',
-//        dataType:'json',
-//
-//        data:{},
-//        success:function(){
-//            console.log('请求成功')
-//        },
-//        error:function(){
-//
-//        },
-//    })
-//    $('#cart_' + cart_id).remove()
-//}
 
 
 

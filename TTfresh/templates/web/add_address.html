@@ -1,0 +1,63 @@
+{% extends 'web/base.html' %}
+
+{% block counter %}
+
+<div class="main_con clearfix">
+	<div class="left_menu_con clearfix">
+		<h3>用户中心</h3>
+		<ul>
+			<li><a href="{% url 'home:userInfo' %}">· 个人信息</a></li>
+			<li><a href="{% url 'home:order_show' %}">· 全部订单</a></li>
+			<li><a href="{% url 'home:user_site' %}" class="active">· 收货地址</a></li>
+		</ul>
+	</div>
+	<div class="right_content clearfix">
+
+			<div class="site_con" >
+				<form method="post" action="">
+					{% csrf_token %}
+                    {{ msg }}
+					<div class="form_group">
+						<label>收件人：</label>
+						<input type="text" name="recipients">
+					</div>
+                    <div class="form_group">
+						<label>手机：</label>
+						<input type="text" name="phone">
+					</div>
+                    <div class="form_group">
+						<label>省：</label>
+						<input type="text" name="province">
+					</div>
+                    <div class="form_group">
+						<label>市：</label>
+						<input type="text" name="city">
+					</div>
+                    <div class="form_group">
+						<label>县：</label>
+						<input type="text" name="county">
+					</div>
+                     <div class="form_group">
+						<label>镇或街道：</label>
+						<input type="text" name="town" placeholder="">
+					</div>
+					<div class="form_group form_group2">
+						<label>详细地址：</label>
+						<textarea class="site_area" name="address"></textarea>
+					</div>
+					<div class="form_group">
+						<label>邮编：</label>
+						<input type="text" name="postcode">
+					</div>
+                    <div style="font-size:15px;position:relative;right:4px;margin:10px 0px;">
+						<label>设置默认地址：</label>
+                        <input type="radio" name="is_default" checked="checked" value="no">否
+                        <input type="radio" name="is_default" value="yes">是
+					</div>
+
+					<input type="submit" name="" value="提交" class="info_submit">
+				</form>
+			</div>
+	</div>
+</div>
+{% endblock %}

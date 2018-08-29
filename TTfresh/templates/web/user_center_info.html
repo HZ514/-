@@ -6,6 +6,17 @@
 
 {% block counter %}
 {% load static %}
+
+{% block cssjs%}
+<script type="text/javascript">
+
+function edit_info(){
+    location.href = '/home/edit_info/'
+}
+
+</script>
+{% endblock %}
+
 <div class="search_bar clearfix">
     <a href="{% url 'home:index' %}" class="logo fl"><img src="/static/web/images/logo.png"></a>
     <div class="sub_page_name fl">|&nbsp;&nbsp;&nbsp;&nbsp;用户中心</div>
@@ -26,11 +37,14 @@
     </div>
     <div class="right_content clearfix">
             <div class="info_con clearfix">
+
+            <h3 class="common_title2" style="float:right;margin-right:80px;background-color:rgb(80,180,200)" onclick="edit_info();">编辑信息</h3>
             <h3 class="common_title2">基本信息</h3>
+
                     <ul class="user_info_list">
-                        <li><span>用户名：</span>{{ user.username }}</li>
-                        <li><span>联系方式：</span>{{ user.userphone }}</li>
-                        <li><span>联系地址：</span>{{ user.useraddress }}</li>
+                        <li><p>&nbsp;&nbsp;&nbsp;用户名：{{ user.userinfo.username }}</p></li>
+                        <li><p>联系方式：{{ user.userinfo.userphone }}</p></li>
+                        <li><p>联系地址：{{ user.userinfo.useraddress }}</p></li>
                     </ul>
             </div>
 

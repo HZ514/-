@@ -86,7 +86,7 @@ class Order(models.Model):
     class Meta:
         db_table = 'tt_oder'
 
-
+# 订单商品
 class OrderGoodsModel(models.Model):
     goods = models.ForeignKey(Goods)  # 关联的商品
     order = models.ForeignKey(Order)  # 关联的订单
@@ -100,7 +100,7 @@ class OrderGoodsModel(models.Model):
 # 用户浏览表
 class UserBrowse(models.Model):
     user = models.ForeignKey(User)  # 关联用户
-    good = models.ForeignKey(Goods,null=True)  # 关联商品
+    good = models.ForeignKey(Goods)  # 关联商品
     browse_time = models.DateTimeField(auto_now=True)  # 浏览时间
 
     class Meta:

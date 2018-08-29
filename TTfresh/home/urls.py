@@ -45,6 +45,15 @@ urlpatterns = [
     url(r'^userInfo/',views.userInfo,name='userInfo'),
     # 收货地址
     url(r'^user_site/',views.user_site,name='user_site'),
+    # 添加地址
+    url(r'^add_address/',views.add_address,name='add_address'),
+    # 删除地址
+    url(r'^delete_address/',views.delete_address,name='delete_address'),
+    # 编辑地址
+    url(r'^update_address/',views.update_address,name='update_address'),
+    # 编辑用信息
+    url(r'^edit_info/',views.edit_info,name='edit_info'),
+
 
 
 

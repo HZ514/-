@@ -1,9 +1,10 @@
 from datetime import datetime
 from django.core.paginator import Paginator
+from django.db.models import Q
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 
-from user.models import UserReceivInfo
+from user.models import UserReceivInfo, User, UserInfo
 from utils.functions import get_order_number
 
 # Create your views here.
@@ -30,7 +31,7 @@ def list(request):
     if request.method == 'GET':
         type_name = request.GET.get('type')
         sort = request.GET.get('sort', 0)
-        page_num = request.GET.get('page',1)
+        page_num = int(request.GET.get('page',1))
         types = FoodType.objects.all()
         type = FoodType.objects.filter(typename=type_name).first()
         goods = type.goods_set.all()
@@ -71,7 +72,7 @@ def detail(request):
         if user.id:
             # 如果浏览的商品已经存在，则修改浏览时间，不存在则创建新的浏览商品信息
             if UserBrowse.objects.filter(good=good).exists():
-                userrrowse = UserBrowse.objects.get(good=good)
+                userrrowse = UserBrowse.objects.get(good_id=good.id)
                 userrrowse.browse_time = datetime.now()
                 userrrowse.save()
             else:
@@ -452,8 +453,10 @@ def order_show(request):
             orders = Order.objects.filter(user=user)
             paginator = Paginator(orders,3)
             page = paginator.page(num_page)
+            is_count = Order.objects.filter(user=user).count()
             data = {
                 'page':page,
+                'is_count':is_count,
             }
             return render(request,'web/user_center_order.html',data)
 
@@ -470,9 +473,146 @@ def userInfo(request):
             return render(request,'web/user_center_info.html',data)
 
 
+# 用户地址
 def user_site(request):
     if request.method == 'GET':
-        return render(request,'web/user_center_site.html')
+        user = request.user
+        data = {}
+        userinfos = UserReceivInfo.objects.filter(~Q(is_default=1),user=user).order_by('-add_time')
+        if UserReceivInfo.objects.filter(is_default=1).exists():
+            is_default_user = UserReceivInfo.objects.filter(is_default=1).first()
+            data['userinfos'] = userinfos
+            data['is_default_user'] = is_default_user
+        else:
+            is_default_user = UserReceivInfo.objects.all().first()
+            userinfos = UserReceivInfo.objects.all()[1:]
+            data['userinfos'] = userinfos
+            data['is_default_user'] = is_default_user
 
+
+
+        return render(request,'web/user_center_site.html',data)
     if request.method == 'POST':
         return HttpResponseRedirect(reverse('home:user_site'))
+
+
+# 添加用户地址
+def add_address(request):
+    if request.method == 'GET':
+        return render(request,'web/add_address.html')
+
+    if request.method == 'POST':
+        user = request.user
+        data = {}
+        recipients = request.POST.get('recipients')
+        phone = request.POST.get('phone')
+        province = request.POST.get('province')
+        city = request.POST.get('city')
+        county = request.POST.get('county')
+        town = request.POST.get('town')
+        postcode = request.POST.get('postcode')
+        address = request.POST.get('address')
+        is_default = request.POST.get('is_default')
+        if len(phone) != 11:
+            data['msg'] = '手机号长度有误！'
+            return render(request, 'web/add_address.html', data)
+        if is_default == 'yes':
+            is_default = 1
+        else:
+            is_default = 0
+        if not all([recipients, phone, province, city, county,
+                town, address]):
+            data['msg'] = '不能为空'
+            return render(request,'web/add_address.html', data)
+        if not is_default:
+            UserReceivInfo.objects.create(name=recipients,phone=phone,province=province,
+                                          city=city,county=county,town=town,detail_address=address,
+                                          postcode=postcode, is_default=is_default, user=user)
+        else:
+            UserReceivInfo.objects.filter(is_default=1).update(is_default=0)
+            UserReceivInfo.objects.create(name=recipients, phone=phone, province=province,
+                                          city=city, county=county, town=town, detail_address=address,
+                                          postcode=postcode, is_default=is_default, user=user)
+
+        return HttpResponseRedirect(reverse('home:user_site'))
+
+# 删除用地址
+def delete_address(request):
+    if request.method == 'POST':
+        data = {
+            'code': 200,
+            'msg': '请求成功',
+
+        }
+        userInfo_id = request.POST.get('userinfo_id')
+        UserReceivInfo.objects.filter(id=userInfo_id).delete()
+        return JsonResponse(data)
+
+
+# 修改用户地址
+def update_address(request):
+    if request.method == 'GET':
+        userInfo_id = request.GET.get('userinfo_id')
+        userinfo = UserReceivInfo.objects.filter(id=userInfo_id).first()
+        data = {
+            'userinfo':userinfo
+        }
+
+        return render(request,'web/update_address.html',data)
+    if request.method == 'POST':
+        data = {}
+        user = request.user
+        userInfo_id = request.POST.get('id')
+        userinfo = UserReceivInfo.objects.filter(id=userInfo_id)
+        recipients = request.POST.get('recipients')
+        phone = request.POST.get('phone')
+        province = request.POST.get('province')
+        city = request.POST.get('city')
+        county = request.POST.get('county')
+        town = request.POST.get('town')
+        postcode = request.POST.get('postcode')
+        address = request.POST.get('address')
+        is_default = request.POST.get('is_default')
+        data['userinfo'] = userinfo.first()
+        if len(phone) != 11:
+            data['msg'] = '手机号长度有误！'
+
+            return render(request, 'web/update_address.html', data)
+        if is_default == 'yes':
+            is_default = 1
+        else:
+            is_default = 0
+        if not all([recipients, phone, province, city, county,
+                    town, address]):
+            data['msg'] = '不能为空'
+            return render(request, 'web/update_address.html', data)
+        if not is_default:
+            userinfo.update(name=recipients, phone=phone, province=province,
+                                          city=city, county=county, town=town, detail_address=address,
+                                          postcode=postcode, is_default=is_default, user=user)
+        else:
+            UserReceivInfo.objects.filter(is_default=1).update(is_default=0)
+            userinfo.update(name=recipients, phone=phone, province=province,
+                                          city=city, county=county, town=town, detail_address=address,
+                                          postcode=postcode, is_default=is_default, user=user)
+
+        return HttpResponseRedirect(reverse('home:user_site'))
+
+
+def edit_info(request):
+    if request.method == 'GET':
+        user = request.user
+        data = {'user':user}
+        return render(request,'web/edit_info.html',data)
+
+    if request.method == 'POST':
+        user = request.user
+        name = request.POST.get('name')
+        phone = request.POST.get('phone')
+        adress = request.POST.get('address')
+        if user.userinfo:
+            UserInfo.objects.update(user=user, username=name, userphone=phone, useraddress=adress)
+        else:
+            UserInfo.objects.create(user=user,username=name,userphone=phone,useraddress=adress)
+
+        return HttpResponseRedirect(reverse('home:userInfo'))

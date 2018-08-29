@@ -18,11 +18,13 @@ from django.contrib import admin
 from django.contrib.staticfiles.urls import static
 
 from TTfresh import settings
+from home import views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^users/',include('user.urls',namespace='user')),
     url(r'^home/',include('home.urls',namespace='home')),
     url(r'^backweb/',include('backweb.urls',namespace='backweb')),
+    url(r'', views.index)
 ]
 urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEAIA_ROOT)
