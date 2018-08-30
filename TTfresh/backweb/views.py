@@ -12,7 +12,6 @@ from backweb.models import MainSide, FoodType, Goods
 from user.models import User, UserStatus
 
 
-
 def login(request):
     if request.method == 'GET':
         return render(request,'backweb/login.html')
@@ -30,6 +29,9 @@ def login(request):
         if not check_password(password,user.u_password):
             error = {'msg': '密码错误'}
             return render(request,'backweb/login.html',error)
+        if not user.is_superuser:
+            error = {'msg':'你没有权限登录'}
+            return render(request, 'backweb/login.html', error)
         # 创建用户状态
         # 1、在服务器中添加
         res = HttpResponseRedirect(reverse('backweb:index'))
@@ -55,21 +57,25 @@ def login(request):
 
 
 def logout(request):
-    def logout(request):
-        if request.method == 'GET':
-            # 删除服务端的ticket值
-            user = request.user
-            user.delete()
-            # 删除cookie中的ticket
-            res = HttpResponseRedirect(reverse('backweb:login'))
-            res.delete_cookie('ticket')
-            return res
+    if request.method == 'GET':
+        # 删除服务端的ticket值
+        user = request.user
+        user_status = user.userstatus_set.all().delete()
+        # 删除cookie中的ticket
+        res = HttpResponseRedirect(reverse('backweb:login'))
+        res.delete_cookie('ticket')
+        return res
 
 
 def index(request):
     if request.method == 'GET':
+        page_num = int(request.GET.get('page', 1))
+        goods = Goods.objects.all()
 
-        return render(request,'backweb/index.html')
+        paginator = Paginator(goods, 3)
+        page = paginator.page(page_num)
+        return render(request, 'backweb/index.html', {'page':page })
+
 
 
 def update_postwd(request):
@@ -130,12 +136,12 @@ def type_manage(request):
         }
         return render(request,'backweb/type_manage.html',data)
 
-
+# 删除商品
 def product_delete(request):
     if request.method == 'GET':
         return HttpResponseRedirect(reverse('backweb:index'))
 
-
+#
 def editor_type(request):
     if request.method == 'GET':
         id = request.GET.get('id')
@@ -156,7 +162,7 @@ def editor_type(request):
 
         return HttpResponseRedirect(reverse('backweb:type_manage'))
 
-
+# 添加商品
 def add_product(request):
     if request.method == 'GET':
         types = FoodType.objects.all()
@@ -187,3 +193,7 @@ def add_product(request):
 
         return HttpResponseRedirect(reverse('backweb:add_product'))
 
+
+def editor_good(request):
+    if request.method == 'GET':
+        return render(request,'backweb/user_role')

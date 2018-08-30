@@ -15,7 +15,11 @@ urlpatterns = [
     url(r'^type_manage/',views.type_manage,name='type_manage'),
     # 删除商品
     url(r'^product_delete/',views.product_delete,name='product_delete'),
-    # 编辑
+    # 编辑分类
     url(r'^editor_type/',views.editor_type,name='editor_type'),
+    # 添加商品
     url(r'^add_product/',views.add_product,name='add_product'),
+    # 编辑商品
+    url(r'^editor_good/',views.editor_good,name='editor'),
+
 ]
