@@ -13,7 +13,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from backweb.models import MainSide, FoodType, Goods, Cart, Order, OrderGoodsModel, UserBrowse
 
-
+# 主页
 def index(request):
     if request.method == 'GET':
         sides = MainSide.objects.all()
@@ -26,7 +26,7 @@ def index(request):
         }
         return render(request,'web/index.html',data)
 
-
+# 商品列表
 def list(request):
     if request.method == 'GET':
         type_name = request.GET.get('type')
@@ -53,7 +53,7 @@ def list(request):
         return render(request, 'web/list.html',data)
         # return HttpResponseRedirect(reverse('home:list_show',kwargs={'typename':typeid}))
 
-
+# 详情
 def detail(request):
     if request.method == 'GET':
         user = request.user
@@ -82,7 +82,7 @@ def detail(request):
         else:
             return render(request, 'web/detail.html',data)
 
-
+# 添加商品
 def add_product(request):
     if request.method == 'POST':
         user = request.user
@@ -109,6 +109,7 @@ def add_product(request):
             return JsonResponse(data)
 
 
+#减少商品
 def reduce_Cart(request):
 
     if request.method == 'POST':
@@ -175,23 +176,20 @@ def add_cart(request):
 # 我的购物车
 def my_cart(request):
     if request.method == 'GET':
-        user = request.user
-        if user:
-            is_select_carts = Cart.objects.filter(is_select=1)
-            count = is_select_carts.count
 
-            carts = Cart.objects.all()
-            moneys = 0
-            for cart in is_select_carts:
-                moneys += cart.c_prices
-            data = {
-                'carts': carts,
-                'count': count,
-                'moneys':round(moneys,3)
-            }
-            return render(request,'web/cart.html',data)
-        else:
-            return render(request,'web/cart.html')
+        is_select_carts = Cart.objects.filter(is_select=1)
+        count = is_select_carts.count
+
+        carts = Cart.objects.all()
+        moneys = 0
+        for cart in is_select_carts:
+            moneys += cart.c_prices
+        data = {
+            'carts': carts,
+            'count': count,
+            'moneys':round(moneys,3)
+        }
+        return render(request,'web/cart.html',data)
 
 
 # 我的订单
@@ -383,21 +381,30 @@ def place_order(request):
     if request.method == "GET":
         user = request.user
         if user:
+            # 获取用户的购物车信息已经对应的下标
             c_list = []
             carts = Cart.objects.filter(is_select=1,user=user)
             i = 1
             for cart in carts:
-                c_list.append([cart,i])
+                c_list.append([cart, i])
                 i += 1
             c_count = Cart.objects.all().count()
+            # 获取所有购物车的总金额
             moneys = 0
             for cart in carts:
                 moneys += cart.c_prices
+            # 获取用户地址
+            userinfo = UserReceivInfo.objects.filter(is_select=1).order_by('-sel_time').first()
+            if not userinfo:
+                userinfo = UserReceivInfo.objects.filter(is_default=1).first()
+            if not userinfo:
+                userinfo = UserReceivInfo.objects.all().order_by('-add_time').first()
 
             data = {
                 'c_list': c_list,
                 'c_count': c_count,
-                'moneys':round(moneys,3)
+                'moneys':round(moneys,3),
+                'userinfo':userinfo
 
             }
 
@@ -411,7 +418,14 @@ def add_order(request):
 
         if user:
             zt = int(request.POST.get('zt'))
-            userinfo = user.userreceivinfo_set.all()[0]
+
+            # 用户提交订单时选择的地址
+            userinfo = UserReceivInfo.objects.filter(is_select=1).order_by('-add_time').first()
+            if not userinfo:
+                userinfo = UserReceivInfo.objects.filter(is_default=1).first()
+            if not userinfo:
+                userinfo = UserReceivInfo.objects.all().order_by('-add_time').first()
+
             # 生成订单编号
             order_id = get_order_number()
 
@@ -438,6 +452,10 @@ def add_order(request):
 
             # 删除购物车中被选中的物品
             carts.delete()
+
+            # 添加订单成功时修改用户选择地址字段，重新让所有的is_select为0，并且让sel_time为空
+            UserReceivInfo.objects.update(is_select=0,sel_time=None)
+
 
             data = {
             }
@@ -479,17 +497,16 @@ def user_site(request):
         user = request.user
         data = {}
         userinfos = UserReceivInfo.objects.filter(~Q(is_default=1),user=user).order_by('-add_time')
-        if UserReceivInfo.objects.filter(is_default=1).exists():
+        if UserReceivInfo.objects.filter(is_default=1,user=user).exists():
             is_default_user = UserReceivInfo.objects.filter(is_default=1).first()
             data['userinfos'] = userinfos
             data['is_default_user'] = is_default_user
         else:
-            is_default_user = UserReceivInfo.objects.all().first()
-            userinfos = UserReceivInfo.objects.all()[1:]
+            is_default_user = userinfos.first()
+            userinfos =userinfos[1:]
+
             data['userinfos'] = userinfos
             data['is_default_user'] = is_default_user
-
-
 
         return render(request,'web/user_center_site.html',data)
     if request.method == 'POST':
@@ -499,11 +516,16 @@ def user_site(request):
 # 添加用户地址
 def add_address(request):
     if request.method == 'GET':
-        return render(request,'web/add_address.html')
+        is_sel = request.GET.get('is_sel')
+        data = {
+            'is_sel':is_sel
+        }
+        return render(request,'web/add_address.html',data)
 
     if request.method == 'POST':
         user = request.user
         data = {}
+        is_sel = request.POST.get('is_sel')
         recipients = request.POST.get('recipients')
         phone = request.POST.get('phone')
         province = request.POST.get('province')
@@ -533,8 +555,10 @@ def add_address(request):
             UserReceivInfo.objects.create(name=recipients, phone=phone, province=province,
                                           city=city, county=county, town=town, detail_address=address,
                                           postcode=postcode, is_default=is_default, user=user)
-
-        return HttpResponseRedirect(reverse('home:user_site'))
+        if is_sel:
+            return HttpResponseRedirect(reverse('home:select_address'))
+        else:
+            return HttpResponseRedirect(reverse('home:user_site'))
 
 # 删除用地址
 def delete_address(request):
@@ -562,6 +586,7 @@ def update_address(request):
     if request.method == 'POST':
         data = {}
         user = request.user
+        is_sel = request.GET.get('is_sel')
         userInfo_id = request.POST.get('id')
         userinfo = UserReceivInfo.objects.filter(id=userInfo_id)
         recipients = request.POST.get('recipients')
@@ -595,10 +620,13 @@ def update_address(request):
             userinfo.update(name=recipients, phone=phone, province=province,
                                           city=city, county=county, town=town, detail_address=address,
                                           postcode=postcode, is_default=is_default, user=user)
+        if is_sel:
+            return HttpResponseRedirect(reverse('home:select_address'))
+        else:
+            return HttpResponseRedirect(reverse('home:user_site'))
 
-        return HttpResponseRedirect(reverse('home:user_site'))
 
-
+# 修改用户信息
 def edit_info(request):
     if request.method == 'GET':
         user = request.user
@@ -616,3 +644,33 @@ def edit_info(request):
             UserInfo.objects.create(user=user,username=name,userphone=phone,useraddress=adress)
 
         return HttpResponseRedirect(reverse('home:userInfo'))
+
+
+# 用户地址选择
+def select_address(request):
+    if request.method == 'GET':
+        user = request.user
+        data = {}
+
+        userinfos = UserReceivInfo.objects.filter(~Q(is_default=1), user=user).order_by('-add_time')
+        if UserReceivInfo.objects.filter(is_default=1).exists():
+            is_default_user = UserReceivInfo.objects.filter(is_default=1).first()
+            data['userinfos'] = userinfos
+            data['is_default_user'] = is_default_user
+        else:
+            is_default_user = UserReceivInfo.objects.all().first()
+            userinfos = UserReceivInfo.objects.all()[1:]
+
+            data['userinfos'] = userinfos
+            data['is_default_user'] = is_default_user
+
+        return render(request, 'web/select_address.html', data)
+
+# 选择地址时修改字段
+def update_is_sel_address(request):
+    if request.method == 'GET':
+        user = request.user
+        userinfo_id = request.GET.get('userinfo_id')
+        UserReceivInfo.objects.filter(user=user,id=userinfo_id).update(is_select=1,sel_time=datetime.now())
+
+        return HttpResponseRedirect(reverse('home:place_order'))

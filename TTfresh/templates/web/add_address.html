@@ -15,6 +15,7 @@
 
 			<div class="site_con" >
 				<form method="post" action="">
+                    <input type="hidden" name="is_sel" value="{{ is_sel }}">
 					{% csrf_token %}
                     {{ msg }}
 					<div class="form_group">

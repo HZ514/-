@@ -18,16 +18,24 @@
     </div>
 </div>
 
-<h3 class="common_title">确认收货地址</h3>
 
+{% if userinfo %}
+<h3 class="common_title">确认收货地址</h3>
 <div class="common_list_con clearfix">
     <dl>
         <dt>寄送到：</dt>
-        <dd><input type="radio" name="" checked="">北京市 海淀区 东北旺西路8号中关村软件园 （李思 收） 182****7528</dd>
+        <dd><input type="radio" name="" checked="">{{ userinfo.province }} {{ userinfo.city }} {{ userinfo.county }} {{ userinfo.detail_address }}（{{ userinfo.name}} 收） {{ userinfo.phone|slice:':3'}}****{{ userinfo.phone|slice:'-5:-1'}}</dd>
     </dl>
-    <a href="user_center_site.html" class="edit_site">编辑收货地址</a>
-
+    <a href="{% url 'home:select_address' %}" class="edit_site">选择收货地址</a>
 </div>
+{% else %}
+<h3 class="common_title">确认收货地址</h3>
+<div class="common_list_con clearfix">
+    <dt style="margin-bottom:60px;position:relative;left:460px;top:30px;">当前没有收货地址,请先添加地址！</dt>
+    <a href="{% url 'home:add_address' %}" class="edit_site">添加收货地址</a>
+</div>
+{% endif %}
+
 
 <h3 class="common_title">支付方式</h3>
 <div class="common_list_con clearfix">
@@ -78,12 +86,18 @@
     </div>
 </div>
 
+{% if userinfo %}
 <div class="order_submit clearfix">
-    <a href="javascript:;"  id="order_btn">提交订单</a>
-    <a href="javascript:;" style="position:relative;right:5px;" id="wait_order">稍后付款</a>
-
-
+    <a href="javascript:;"  id="order_btn" >提交订单</a>
+    <a href="javascript:;" style="position:relative;right:5px;" id="wait_order" >稍后付款</a>
 </div>
+{% else %}
+<div class="order_submit clearfix">
+    <a href="javascript:;"  id="order_b" onclick="order_b();">提交订单</a>
+    <a href="javascript:;" style="position:relative;right:5px;" id="wait_ord" onclick="wait_ord();">稍后付款</a>
+</div>
+{% endif %}
+
 {% endblock %}
 
 {% block popup_con %}
@@ -152,6 +166,16 @@
         })
 
     });
+
+function order_b(){
+    alert('您当前没有地址,请先添加地址！')
+}
+
+function wait_ord(){
+    alert('您当前没有地址,请先添加地址！')
+}
+
+
 </script>
 {% endblock %}
 

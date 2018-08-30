@@ -20,7 +20,7 @@
 		<input type="button" class="input_btn fr" name="" value="搜索">
 	</div>
 </div>
-
+{% if carts %}
 <div class="total_count">全部商品<em>{{ count }}</em>件</div>
 <ul class="cart_list_th clearfix">
 	<li class="col01">商品名称</li>
@@ -30,6 +30,7 @@
 	<li class="col05">小计</li>
 	<li class="col06">操作</li>
 </ul>
+
 {% for cart in carts %}
 <ul class="cart_list_td clearfix" id="cart_{{ cart.id }}">
     {% if cart.is_select %}
@@ -55,7 +56,6 @@
 </ul>
 {% endfor %}
 
-
 <ul class="settlements">
 	<li class="col01"><input class="is_all" type="checkbox" name="" checked="" onclick="all_select();"></li>
 	<li class="col02">全选</li>
@@ -63,7 +63,11 @@
 	<li class="col03">合计(不含运费)：<span>¥</span><em id="moneys">{{ moneys }}</em><br>共计<b id="all_count">{{ count }}</b>件商品</li>
 	<li class="col04"><a href="{% url 'home:place_order' %}">去结算</a></li>
 </ul>
-
+{% else %}
+<ul class="settlements">
+    <p style="text-align:center;position:relative;top:20px;font-size:20px;">购物车还没有数据！</p>
+</ul>
+{% endif %}
 
 <script type="text/javascript">
 // 刚进页面是否全选
@@ -80,5 +84,9 @@ $.get('/home/is_all_o/',function(data){
 
 })
 </script>
+
+
+
 {% endblock %}
+
 

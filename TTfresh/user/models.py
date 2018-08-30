@@ -40,6 +40,8 @@ class UserReceivInfo(models.Model):
     is_default = models.BooleanField(default=0)  # 是否是默认地址
     user = models.ForeignKey(User)  # 关联用户
     add_time = models.DateTimeField(auto_now=True)  # 地址添加时间
+    is_select = models.BooleanField(default=0)  # 是否是用户下单时选择的地址
+    sel_time = models.DateTimeField(null=True)  # 用户选择地址时的时间
 
     class Meta:
         db_table = 'tt_userreceivinfo'

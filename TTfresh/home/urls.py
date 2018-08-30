@@ -53,6 +53,10 @@ urlpatterns = [
     url(r'^update_address/',views.update_address,name='update_address'),
     # 编辑用信息
     url(r'^edit_info/',views.edit_info,name='edit_info'),
+    # 选择地址
+    url(r'^select_address/',views.select_address,name='select_address'),
+    # 修改是否是现在选的地址
+    url(r'^update_is_sel_address/',views.update_is_sel_address,name='update_is_sel_address'),
 
 
 
