@@ -2,36 +2,38 @@ import random
 from datetime import datetime,timedelta
 from django.contrib.auth.hashers import make_password,check_password
 from django.core.paginator import Paginator
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 
 # Create your views here.
 from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
 
 from backweb.models import MainSide, FoodType, Goods
 from user.models import User, UserStatus
 
 
+# 登录
 def login(request):
     if request.method == 'GET':
-        return render(request,'backweb/login.html')
+        return render(request,'backweb/user/login.html')
 
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
         if not all([username,password]):
             error = {'msg': '请输入完整'}
-            return render(request,'backweb/login.html',error)
+            return render(request,'backweb/user/login.html',error)
         user = User.objects.filter(u_name=username).first()
         if not user:
             error = {'msg': '用户不存在'}
-            return render(request,'backweb/login.html',error)
+            return render(request,'backweb/user/login.html',error)
         if not check_password(password,user.u_password):
             error = {'msg': '密码错误'}
-            return render(request,'backweb/login.html',error)
+            return render(request,'backweb/user/login.html',error)
         if not user.is_superuser:
             error = {'msg':'你没有权限登录'}
-            return render(request, 'backweb/login.html', error)
+            return render(request, 'backweb/user/login.html', error)
         # 创建用户状态
         # 1、在服务器中添加
         res = HttpResponseRedirect(reverse('backweb:index'))
@@ -56,6 +58,7 @@ def login(request):
         return res
 
 
+# 退出
 def logout(request):
     if request.method == 'GET':
         # 删除服务端的ticket值
@@ -67,14 +70,35 @@ def logout(request):
         return res
 
 
+# 主页
+@csrf_exempt
 def index(request):
     if request.method == 'GET':
         page_num = int(request.GET.get('page', 1))
         goods = Goods.objects.all()
+        good_list = FoodType.objects.all()
 
         paginator = Paginator(goods, 3)
         page = paginator.page(page_num)
-        return render(request, 'backweb/index.html', {'page':page })
+
+
+        return render(request, 'backweb/index/index.html', {'page':page,'good_list':good_list})
+
+    if request.method == 'POST':
+        data = {}
+        data['code'] = 200
+        data['msg'] = '请求成功'
+        id = int(request.POST.get('id'))
+        ta = request.POST.get('ta')
+        data['ta'] = ta
+
+        good = Goods.objects.filter(id=id)
+        if ta == '推荐':
+            good.update(is_new=0)
+        elif ta == '不推荐':
+            good.update(is_new=1)
+
+        return JsonResponse(data)
 
 
 
@@ -98,24 +122,28 @@ def update_postwd(request):
             error = '密码不一致'
             return render(request,'backweb/updatePostwd.html',{'error':error})
 
+
 def listUser(request):
     if request.method == 'GET':
         users = User.objects.all()
         return render(request, 'backweb/users_list.html', {'users': users})
 
 
+# 添加幻灯片图片
 def add_side(request):
     if request.method == 'GET':
-        return render(request,'backweb/add_side.html')
+        return render(request,'backweb/side/add_side.html')
     if request.method == 'POST':
         side_name = request.POST.get('side_name')
         img = request.FILES.get('img')
         MainSide.objects.create(name=side_name,img=img)
         return HttpResponseRedirect(reverse('backweb:add_side'))
 
+
+# 添加分类
 def add_type(request):
     if request.method == 'GET':
-        return render(request,'backweb/add_type.html')
+        return render(request,'backweb/type/add_type.html')
 
     if request.method == 'POST':
         type_id = request.POST.get('type_id')
@@ -125,7 +153,8 @@ def add_type(request):
         return HttpResponseRedirect(reverse('backweb:add_type'))
 
 
-def type_manage(request):
+# 分类分页管理
+def manage_type(request):
     if request.method == 'GET':
         page_num = int(request.GET.get('page', 1))
         types = FoodType.objects.all()
@@ -134,14 +163,17 @@ def type_manage(request):
         data = {
             'page':page,
         }
-        return render(request,'backweb/type_manage.html',data)
+        return render(request,'backweb/type/type_list.html',data)
+
 
 # 删除商品
-def product_delete(request):
+def good_delete(request, id):
     if request.method == 'GET':
+
+        Goods.objects.filter(id=int(id)).delete()
         return HttpResponseRedirect(reverse('backweb:index'))
 
-#
+# 编辑分类
 def editor_type(request):
     if request.method == 'GET':
         id = request.GET.get('id')
@@ -149,7 +181,7 @@ def editor_type(request):
         data = {
             'type':type,
         }
-        return render(request,'backweb/editor_type.html', data)
+        return render(request,'backweb/type/editor_type.html', data)
 
     if request.method == 'POST':
         id = request.POST.get('id')
@@ -160,7 +192,7 @@ def editor_type(request):
             img = FoodType.objects.get(id=id).type_img
         FoodType.objects.filter(id=id).update(typeid=type_id,typename=type_name,type_img=img)
 
-        return HttpResponseRedirect(reverse('backweb:type_manage'))
+        return HttpResponseRedirect(reverse('backweb:manage_type'))
 
 # 添加商品
 def add_product(request):
@@ -169,7 +201,7 @@ def add_product(request):
         data = {
             'types':types,
         }
-        return render(request,'backweb/add_product.html',data)
+        return render(request,'backweb/good/add_product.html',data)
 
     if request.method == 'POST':
         product_id = request.POST.get('product_id')
@@ -194,6 +226,78 @@ def add_product(request):
         return HttpResponseRedirect(reverse('backweb:add_product'))
 
 
-def editor_good(request):
+# 编辑商品
+def good_editor(request, id):
     if request.method == 'GET':
-        return render(request,'backweb/user_role')
+        good = Goods.objects.filter(id=id).first()
+        types = FoodType.objects.all()
+        data = {
+            'good': good,
+            'types':types
+        }
+        return render(request,'backweb/good/editor_product.html', data)
+
+    if request.method == 'POST':
+        id = request.POST.get('id')
+        product_id = request.POST.get('product_id')
+        product_name = request.POST.get('product_name')
+        price = float(request.POST.get('price'))
+        one_weight = request.POST.get('one_weight')
+        img = request.FILES.get('img')
+        type = request.POST.get('type')
+        goods_type = request.POST.get('goods_type')
+        food_type = FoodType.objects.filter(typename=goods_type).first()
+        introduction = request.POST.get('introduction')
+        detail = request.POST.get('detail')
+
+        if not img:
+            img = Goods.objects.get(id=id).productimg
+
+        type = 0 if type == 'no' else 1
+        Goods.objects.filter(id=int(id)).update(productid=product_id, productimg=img, productname=product_name,
+                             pmdesc=introduction, is_new=type, price=price, one_weight=one_weight,
+                             detail=detail, goods_type=food_type)
+
+        return HttpResponseRedirect(reverse('backweb:index'))
+
+
+# 幻灯片展示
+def slide_list(request):
+    if request.method == 'GET':
+        sides = MainSide.objects.all()
+        data = {
+            'sides':sides
+        }
+        return render(request,'backweb/side/slide_list.html',data)
+
+
+# 幻灯片删除
+def del_side(request,id):
+    if request.method == 'GET':
+        MainSide.objects.filter(id=int(id)).delete()
+        return HttpResponseRedirect(reverse('backweb:slide_list'))
+
+
+# 幻灯片编辑
+def editor_side(request):
+    if request.method == 'GET':
+        id = int(request.GET.get('id'))
+        side = MainSide.objects.filter(id=id).first()
+        return render(request,'backweb/side/editor_side.html',{'side':side})
+
+    if request.method == 'POST':
+        id = request.POST.get('id')
+        side_name = request.POST.get('side_name')
+        img = request.FILES.get('img')
+        side = MainSide.objects.filter(id=id)
+        if not img:
+            side.update(name=side_name)
+        else:
+            side.update(name=side_name,img=img)
+        return HttpResponseRedirect(reverse('backweb:slide_list'))
+
+# 删除分类
+def delete_type(request, id):
+    if request.method == 'GET':
+        FoodType.objects.filter(id=int(id)).delete()
+        return HttpResponseRedirect(reverse('backweb:manage_type'))

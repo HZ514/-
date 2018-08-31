@@ -45,78 +45,43 @@
 </style>
 <section class="rt_wrap content mCustomScrollbar">
  <div class="rt_content">
-     {% if 'add' in user.authority or user.is_superuser %}
-      <div class="page_title">
-       <h2 class="fl">商品列表</h2>
-      </div>
-     {% endif %}
-      <form action="/backweb/select_art/" method="get">
-      <section class="mtb">
-       <select class="select" name="cla">
-           <option value="类别">类别</option>
-           {% for art in art_list %}
-           <option value="{{ art }}">{{ art }}</option>
-           {% endfor %}
-       </select>
-       <input type="text" class="textbox textbox_225" name="que" placeholder="输入要查询的文章标题"/>
-       <input onclick="query();" type="submit" value="查询" class="group_btn"/>
-      </section>
-      </form>
+
       <table class="table">
        <tr>
         <th>编码</th>
-        <th>商品id</th>
-        <th>商品图片</th>
-        <th>商品名称</th>
-        <th>新品推荐</th>
-        <th>商品简介</th>
+        <th>分类名称</th>
+        <th>分类图片</th>
+        <th>分类ID</th>
         <th>操作</th>
        </tr>
-        {% for good in page %}
+        {% for type in page %}
        <tr id="id">
-            <td class="center">{{ good.id}}</td>
-            <td class="center">{{ good.productid }}</td>
-
-            <td class="center">{{ good.productname }}</td>
-            <td class="center"><img src="/static/web/images/goods/{{ good.productimg }}" height="50" width="50" alt=""></td>
-            <td class="center" id="t1">
-                {% if good.is_new %}
-                    <a class="{{ good.id}}">推荐</a>
-                {% else %}
-                    <a class="{{ good.id}}" >不推荐</a>
-                {% endif %}
-            </td>
-            <td class="center">{{ good.pmdesc }}</td>
-
+            <td class="center">{{ type.id}}</td>
+            <td class="center">{{ type.typename }}</td>
+            <td class="center"><img src="/static/web/images/{{ type.type_img }}" height="50" width="50" alt=""></td>
+            <td class="center">{{ type.typeid }}</td>
             <td class="center">
+                 <a href="{% url 'backweb:editor_type' %}?id={{ type.id }}" title="编辑" class="link_icon">&#101;</a>
 
-                 <a href="" title="编辑" class="link_icon">&#101;</a>
-
-                 <a href="/backweb/delblog/{{ good.id }}" title="删除" class="link_icon">&#100;</a>
+                 <a href="/backweb/delete_type/{{ type.id }}" title="删除" class="link_icon">&#100;</a>
 
             </td>
+
        </tr>
         {% endfor %}
       </table>
 
       <aside class="paging">
        {% if page.has_previous == True %}
-            <a href="{% url 'backweb:index' %}?page={{ page.previous_page_number}}">上一页</a>
+            <a href="{% url 'backweb:manage_type' %}?page={{ page.previous_page_number}}">上一页</a>
        {% endif %}
-       <a href="{% url 'backweb:index' %}">第一页</a>
-
-        {% if page.has_previous == True %}
-            <a href="{% url 'backweb:index' %}?page={{ page.previous_page_number}}">{{ page.previous_page_number }}</a>
-       {% endif %}
-
-        <a href="{% url 'backweb:index' %}?page={{ page.number }}">{{ page.number }}</a>
-        {% if page.has_next == True %}
-        <a href="{% url 'backweb:index' %}?page={{ page.next_page_number }}">{{ page.next_page_number }}</a>
-        {% endif %}
-
-       <a href="{% url 'backweb:index' %}?page={{ page.paginator.num_pages }}">最后一页</a>
+       <a href="{% url 'backweb:manage_type' %}">第一页</a>
+            {% for i in page.paginator.page_range %}
+                <a href="{% url 'backweb:manage_type' %}?page={{ i}}">{{ i }}</a>
+            {% endfor %}
+       <a href="{% url 'backweb:manage_type' %}?page={{ page.paginator.num_pages }}">最后一页</a>
        {% if page.has_next == True %}
-            <a href="{% url 'backweb:index' %}?page={{ page.next_page_number}}">下一页</a>
+            <a href="{% url 'backweb:manage_type' %}?page={{ page.next_page_number}}">下一页</a>
        {% endif %}
 
       </aside>
@@ -245,41 +210,6 @@
         chart.write("pie");
     }
 </script>
-<script type="text/javascript">
-    $(function(){
-        var t1a = $('#t1 a')
-        $('#t1 a,#tz a').on('click',function(){
-            id = $(this).attr('class')
-            ta = $(this).text()
-            t = $(this)
-            <!--alert(id)-->
-            <!--alert($(this).text())-->
-            $.ajax({
-                url:'/backweb/index/',
-                dataType:'json',
-                type:'POST',
-                data:{
-                    ta: ta,
-                    id:id
-                },
-                success:function(data){
-                    <!--alert(data)-->
-                     if (ta == '推荐'){
-                        t.text('不推荐')
-                    }else if (ta == '不推荐'){
-                        t.text('推荐')
-                    }else if(ta == '展示'){
-                        t.text('不展示')
-                    }else if (ta == '不展示'){
-                        t.text('展示')
-                    }
-                },
-                error:function(){
-                    alert('请求失败')
-                }
-            })
-        })
-    })
-</script>
+
 {% endblock %}
 

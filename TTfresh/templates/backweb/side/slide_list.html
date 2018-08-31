@@ -45,48 +45,40 @@
 </style>
 <section class="rt_wrap content mCustomScrollbar">
  <div class="rt_content">
+     {% if 'add' in user.authority or user.is_superuser %}
+      <div class="page_title">
+       <h2 class="fl">幻灯片列表</h2>
+      </div>
+     {% endif %}
+      <form action="/backweb/select_art/" method="get">
+      <section class="mtb">
 
+      </section>
+      </form>
       <table class="table">
        <tr>
-        <th>编码</th>
-        <th>分类名称</th>
-        <th>分类图片</th>
-        <th>分类ID</th>
+        <th>名称</th>
+        <th>图片</th>
         <th>操作</th>
        </tr>
-        {% for article in page %}
-       <tr id="id">
-            <td class="center">{{ article.id}}</td>
-            <td class="center">{{ article.typename }}</td>
-            <td class="center"><img src="/static/web/images/{{ article.type_img }}" height="50" width="50" alt=""></td>
-            <td class="center">{{ article.typeid }}</td>
-            <td class="center">
-                 {% if 'update' in user.authority or user.is_superuser %}
-                 <a href="{% url 'backweb:editor_type' %}?id={{ article.id }}" title="编辑" class="link_icon">&#101;</a>
-                 {% endif %}
-                 {% if 'del' in user.authority or user.is_superuser %}
-                 <a href="/backweb/product_delete/{{ article.id }}" title="删除" class="link_icon">&#100;</a>
-                 {% endif %}
-            </td>
 
+       {% for side in sides %}
+       <tr id="id">
+            <td class="center">{{ side.name}}</td>
+
+            <td class="center"><img src="/static/web/images/{{ side.img }}" height="50" width="100" alt=""></td>
+
+            <td class="center">
+
+                 <a href="{% url 'backweb:editor_side' %}?id={{ side.id }}" title="编辑" class="link_icon">&#101;</a>
+
+                 <a href="/backweb/del_side/{{ side.id }}" title="删除" class="link_icon">&#100;</a>
+
+            </td>
        </tr>
         {% endfor %}
       </table>
 
-      <aside class="paging">
-       {% if page.has_previous == True %}
-            <a href="{% url 'backweb:type_manage' %}?page={{ page.previous_page_number}}">上一页</a>
-       {% endif %}
-       <a href="{% url 'backweb:type_manage' %}">第一页</a>
-            {% for i in page.paginator.page_range %}
-                <a href="{% url 'backweb:type_manage' %}?page={{ i}}">{{ i }}</a>
-            {% endfor %}
-       <a href="{% url 'backweb:type_manage' %}?page={{ page.paginator.num_pages }}">最后一页</a>
-       {% if page.has_next == True %}
-            <a href="{% url 'backweb:type_manage' %}?page={{ page.next_page_number}}">下一页</a>
-       {% endif %}
-
-      </aside>
  </div>
 </section>
 

@@ -260,7 +260,7 @@ def all_select(request):
             carts = Cart.objects.all()
             all_count = carts.count()
             for cart in carts:
-                moneys = cart.c_prices
+                moneys += cart.c_prices
             f_is_all = 1
         else:
             Cart.objects.update(is_select=0)
@@ -456,8 +456,9 @@ def add_order(request):
             # 添加订单成功时修改用户选择地址字段，重新让所有的is_select为0，并且让sel_time为空
             UserReceivInfo.objects.update(is_select=0,sel_time=None)
 
-
             data = {
+                'code':200,
+                'msg':'请求成功'
             }
             return JsonResponse(data)
 

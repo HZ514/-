@@ -76,15 +76,27 @@
 
 			<div class="pagenation">
                 {% if page.has_previous == True %}
-                <a href="{% url 'home:order_show' %}?page={{ page.previous_page_number }}"><上一页</a>
+                <a href="{% url 'home:order_show' %}?page={{ page.previous_page_number }}" style="background-color:rgb(200,202,202)"><上一页</a>
+                {% else %}
+                <a>上一页</a>
                 {% endif %}
+
                 {% if page %}
-                {% for i in page.paginator.page_range %}
-                <a href="{% url 'home:order_show' %}?page={{ i }}" class="active">{{ i }}</a>
-                {% endfor %}
+                {% if page.has_previous == True %}
+                <a href="{% url 'home:order_show' %}?page={{ page.previous_page_number }}" class="active">{{ page.previous_page_number }}</a>
                 {% endif %}
+
+                <a href="{% url 'home:order_show' %}?page={{ page.number }}" class="active">{{ page.number }}</a>
+
                 {% if page.has_next == True %}
-                <a href="{% url 'home:list' %}?page={{ page.next_page_number }}">下一页></a>
+                 <a href="{% url 'home:order_show' %}?page={{ page.next_page_number }}" class="active">{{ page.next_page_number }}</a>
+                {% endif %}
+                {% endif %}
+
+                {% if page.has_next == True %}
+                <a href="{% url 'home:order_show' %}?page={{ page.next_page_number }}" style="background-color:rgb(200,202,202)">下一页></a>
+                {% else %}
+                <a >下一页</a>
                 {% endif %}
 			</div>
 	</div>

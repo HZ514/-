@@ -95,6 +95,12 @@ function is_selcet(cart_id){
                $('#moneys').html(data.moneys)
                $('#all_count').text(data.all_count)
            }
+           if (data.all_count){
+               $("#close").html("<a href='{% url 'home:place_order' %}' >去结算</a>")
+
+           }else{
+               $('#close').html('<a style="background-color:rgb(200,200,200)">去结算</a>')
+           }
 
             },
         error:function(data){
@@ -121,12 +127,15 @@ function all_select(){
 
                         $('.is_' + data.carts_id[i])[0].checked = true
                     }
+
+                $("#close").html("<a href='{% url 'home:place_order' %}' >去结算</a>")
                 $('#moneys').html(data.moneys)
                 $('#all_count').text(data.all_count)
                 }else{
                     for (var i = 0; i < data.carts_id.length; i++){
                         $('.is_' + data.carts_id[i])[0].checked = false
                     }
+                $('#close').html('<a style="background-color:rgb(200,200,200)">去结算</a>')
                 }
                 $('#moneys').html(data.moneys)
                 $('#all_count').text(data.all_count)
@@ -153,6 +162,7 @@ function add_goods_num(cart_id){
              $('#c_d_' + cart_id).val(data.c_num)
              $('#moneys').html(data.moneys)
              $('#c_price_' + cart_id).html(data.c_prices + '元')
+             $
         },
         error:function(data){
             alert('请求失败')

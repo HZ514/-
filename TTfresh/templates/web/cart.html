@@ -61,7 +61,11 @@
 	<li class="col02">全选</li>
     <!-- 总订单金额 -->
 	<li class="col03">合计(不含运费)：<span>¥</span><em id="moneys">{{ moneys }}</em><br>共计<b id="all_count">{{ count }}</b>件商品</li>
-	<li class="col04"><a href="{% url 'home:place_order' %}">去结算</a></li>
+	{% if count %}
+	<li class="col04" id="close"><a href="{% url 'home:place_order' %}" >去结算</a></li>
+    {% else %}
+    <li class="col04" id="close"><a style="background-color:rgb(200,200,200)">去结算</a></li>
+    {% endif %}
 </ul>
 {% else %}
 <ul class="settlements">

@@ -6,7 +6,7 @@ from user.models import User, UserReceivInfo
 
 
 class Main(models.Model):
-    img = models.CharField(max_length=200)  # 图片
+    img = models.CharField(max_length=200,null=True)  # 图片
     name = models.CharField(max_length=100)  # 名称
     trackid = models.CharField(max_length=16)  # 通用id
 
