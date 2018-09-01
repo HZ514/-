@@ -67,15 +67,15 @@
 
       <aside class="paging">
        {% if page.has_previous == True %}
-            <a href="{% url 'backweb:index' %}?page={{ page.previous_page_number}}">上一页</a>
+            <a href="{% url 'backweb:good_list' %}?page={{ page.previous_page_number}}">上一页</a>
        {% endif %}
-       <a href="{% url 'backweb:index' %}">第一页</a>
+       <a href="{% url 'backweb:good_list' %}">第一页</a>
             {% for i in page.paginator.page_range %}
-                <a href="{% url 'backweb:index' %}?page={{ i}}">{{ i }}</a>
+                <a href="{% url 'backweb:good_list' %}?page={{ i}}">{{ i }}</a>
             {% endfor %}
-       <a href="{% url 'backweb:index' %}?page={{ page.paginator.num_pages }}">最后一页</a>
+       <a href="{% url 'backweb:good_list' %}?page={{ page.paginator.num_pages }}">最后一页</a>
        {% if page.has_next == True %}
-            <a href="{% url 'backweb:index' %}?page={{ page.next_page_number}}">下一页</a>
+            <a href="{% url 'backweb:good_list' %}?page={{ page.next_page_number}}">下一页</a>
        {% endif %}
 
       </aside>

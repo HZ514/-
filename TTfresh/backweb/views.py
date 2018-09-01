@@ -74,15 +74,51 @@ def logout(request):
 @csrf_exempt
 def index(request):
     if request.method == 'GET':
+
+        return render(request,'backweb/index/index.html')
+
+
+# 商品展示
+def good_list(request):
+    if request.method == 'GET':
         page_num = int(request.GET.get('page', 1))
-        goods = Goods.objects.all()
-        good_list = FoodType.objects.all()
+        type = request.GET.get('type',0)
+        context = request.GET.get('context','')
+        # 如果拿不到分类则将type_id设置为0
+        if not type:
+            type_id = int(type)
+        else:
+            type_id = int(type)
+        # 所有的分类
+        type_list = FoodType.objects.all()
+        # 根据相应的分类查找相应的商品
+        # 如果type_id不为0则获取相应分类的商品
+        if not type_id:
+            goods = Goods.objects.all()
+        else:
+            goods = Goods.objects.filter(goods_type_id=type_id)
+
+        # 如果有搜索条件则按照搜索条件模糊查询
+        if context:
+            goods = Goods.objects.filter(goods_type_id=type_id,productname__contains=context)
+            if not goods:
+                goods = Goods.objects.filter(goods_type_id=type_id,productname__contains=context[-1])
+
+
+
+
 
         paginator = Paginator(goods, 3)
         page = paginator.page(page_num)
 
+        data = {
+            'page': page,
+            'type_list': type_list,
+            'type_id': type_id,
+            'context':context,
+        }
 
-        return render(request, 'backweb/index/index.html', {'page':page,'good_list':good_list})
+        return render(request, 'backweb/good/good_list.html',data)
 
     if request.method == 'POST':
         data = {}
@@ -99,7 +135,6 @@ def index(request):
             good.update(is_new=1)
 
         return JsonResponse(data)
-
 
 
 def update_postwd(request):
@@ -172,6 +207,7 @@ def good_delete(request, id):
 
         Goods.objects.filter(id=int(id)).delete()
         return HttpResponseRedirect(reverse('backweb:index'))
+
 
 # 编辑分类
 def editor_type(request):
@@ -301,3 +337,16 @@ def delete_type(request, id):
     if request.method == 'GET':
         FoodType.objects.filter(id=int(id)).delete()
         return HttpResponseRedirect(reverse('backweb:manage_type'))
+
+
+# 查询商品
+def select_goods(request):
+    if request.method == 'GET':
+        data={}
+        type_id = request.GET.get('type')
+        context = request.GET.get('context')
+        return render(request,'backweb/index/index.html')
+
+    if request.method == 'POST':
+        data = {}
+        return JsonResponse(data)

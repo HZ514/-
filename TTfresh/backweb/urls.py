@@ -25,7 +25,10 @@ urlpatterns = [
     url(r'^good_delete/(\d+)/$',views.good_delete,name='good_delete'),
     # 编辑商品
     url(r'^good_editor/(\d+)/$',views.good_editor,name='good_editor'),
+    # 商品展示
+    url(r'^good_list/',views.good_list,name='good_list'),
     # 商品查询
+    url(r'^select_goods/',views.select_goods,name='select_goods'),
 
     # 幻灯片商品展示
     url(r'^slide_list/',views.slide_list,name='slide_list'),

@@ -76,6 +76,8 @@
 
         <ul class="goods_list fl">
             {% for good in type.goods_set.all %}
+
+
             {% if forloop.counter > 0 and forloop.counter < 5 %}
             <li>
                 <h4><a href="{% url 'home:detail' %}?type={{ type.typename }}&product_id={{ good.id }}">{{ good.productname }}</a></h4>
@@ -83,6 +85,7 @@
                 <div class="prize">{{ good.price }}</div>
             </li>
             {% endif %}
+
             {% endfor %}
 
         </ul>

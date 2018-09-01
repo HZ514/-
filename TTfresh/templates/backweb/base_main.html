@@ -13,7 +13,7 @@
 
 {% block left_content %}
 <aside class="lt_aside_nav content mCustomScrollbar">
- <h2><a href="index.html">起始页</a></h2>
+ <h2><a href="{% url 'backweb:index' %}">起始页</a></h2>
  <ul>
   <li>
    <dl>
@@ -21,7 +21,7 @@
     <dt>商品管理</dt>
     {% endif %}
     <!--当前链接则添加class:active-->
-    <dd><a href="{% url 'backweb:index' %}" class="active">商品列表</a></dd>
+    <dd><a href="{% url 'backweb:good_list' %}" class="active">商品列表</a></dd>
     <dd><a href="{% url 'backweb:slide_list' %}" class="active">幻灯片列表</a></dd>
     <dd><a href="{% url 'backweb:manage_type' %}" class="active">分类列表</a></dd>
    </dl>

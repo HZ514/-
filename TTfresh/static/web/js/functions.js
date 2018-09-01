@@ -110,6 +110,7 @@ function is_selcet(cart_id){
 }
 
 // 是否全选
+@csrf_exempt
 function all_select(){
     var csrf = $('input[name="csrfmiddlewaretoken"]').val()
     var is_all =  $('.is_all').prop("checked")

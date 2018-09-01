@@ -1,0 +1,227 @@
+{% extends 'backweb/base_main.html' %}
+
+{% block title %}
+    后台管理系统
+{% endblock %}
+
+{% load static %}
+{% block Jsq %}
+<script src="{% static 'backweb/js/html5.js' %}"></script>
+<script src="{% static 'backweb/js/jquery.js' %}"></script>
+<script src="{% static 'backweb/js/jquery.mCustomScrollbar.concat.min.js' %}"></script>
+<script src="{% static 'backweb/js/select/select.js' %}"></script>
+
+
+
+<script>
+	(function($){
+		$(window).load(function(){
+
+			$("a[rel='load-content']").click(function(e){
+				e.preventDefault();
+				var url=$(this).attr("href");
+				$.get(url,function(data){
+					$(".content .mCSB_container").append(data); //load new content inside .mCSB_container
+					//scroll-to appended content
+					$(".content").mCustomScrollbar("scrollTo","h2:last");
+				});
+			});
+
+			$(".content").delegate("a[href='top']","click",function(e){
+				e.preventDefault();
+				$(".content").mCustomScrollbar("scrollTo",$(this).attr("href"));
+			});
+
+		});
+	})(jQuery);
+</script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+{% endblock %}
+
+
+{% block content %}
+<style>
+.dataStatistic{width:400px;height:200px;border:1px solid #ccc;margin:0 auto;margin:10px;overflow:hidden}
+#cylindrical{width:400px;height:200px;margin-top:-15px}
+#line{width:400px;height:200px;margin-top:-15px}
+#pie{width:400px;height:200px;margin-top:-15px}
+</style>
+<section class="rt_wrap content mCustomScrollbar">
+ <div class="rt_content">
+
+      <div class="page_title">
+       <h2 class="fl">商品列表</h2>
+      </div>
+      <!--<form action="/backweb/select_art/" method="get">-->
+      {% csrf_token %}
+      <section class="mtb">
+       <select class="select" id="p_type" name="cla">
+           {% if not type_id %}
+
+           <option value="0" selected="selected">全部分类</option>
+           {% for type in type_list %}
+           <option value="{{ type.id }}">{{ type.typename }}</option>
+           {% endfor %}
+
+           {% else %}
+
+           <option value="0">全部分类</option>
+           {% for type in type_list %}
+           {% if type.id == type_id %}
+           <option value="{{ type.id }}" selected>{{ type.typename }}</option>
+           {% else %}
+           <option value="{{ type.id }}">{{ type.typename }}</option>
+           {% endif %}
+           {% endfor %}
+
+           {% endif %}
+
+       </select>
+       {% if context %}
+       <input type="text" id="context" class="textbox textbox_225" name="que" placeholder="{{ context }}"/>
+       {% else %}
+       <input type="text" id="context" class="textbox textbox_225" name="que" placeholder="输入要查询的商品"/>
+       {% endif %}
+       <input type="submit" onclick="select_goods();" value="查询" class="group_btn"/>
+      </section>
+      <!--</form>-->
+      <table class="table">
+       <tr>
+        <th>编码</th>
+        <th>商品名称</th>
+        <th>商品图片</th>
+        <th>价格</th>
+        <th>新品推荐</th>
+        <th>商品简介</th>
+        <th>操作</th>
+       </tr>
+        {% for good in page %}
+       <tr id="id">
+            <td class="center">{{ good.id}}</td>
+            <td class="center">{{ good.productname }}</td>
+            <td class="center"><img src="/static/web/images/goods/{{ good.productimg }}" height="50" width="50" alt=""></td>
+
+            <td class="center">{{ good.price }}</td>
+
+            <td class="center" id="t1">
+                {% if good.is_new %}
+                    <a class="{{ good.id}}">推荐</a>
+                {% else %}
+                    <a class="{{ good.id}}" >不推荐</a>
+                {% endif %}
+            </td>
+            <td class="center">{{ good.pmdesc }}</td>
+
+            <td class="center">
+
+                 <a href="/backweb/good_editor/{{ good.id }}/" title="编辑" class="link_icon">&#101;</a>
+
+                 <a href="/backweb/good_delete/{{ good.id }}/" title="删除" class="link_icon">&#100;</a>
+
+            </td>
+       </tr>
+        {% endfor %}
+      </table>
+
+      <aside class="paging">
+        {% if context %}
+        <a href="{% url 'backweb:good_list' %}?type={{ type_id }}&context={{ context }}&page=1">第一页</a>
+        {% if page.has_previous == True %}
+            <a href="{% url 'backweb:good_list' %}?type={{ type_id }}&context={{ context }}&page={{ page.previous_page_number}}">上一页</a>
+        {% else %}
+            <a style="background-color:rgb(200,202,20)">上一页</a>
+        {% endif %}
+        {% if page.has_previous == True %}
+            <a href="{% url 'backweb:good_list' %}?type={{ type_id }}&context={{ context }}&page={{ page.previous_page_number}}">{{ page.previous_page_number }}</a>
+        {% endif %}
+        <a href="{% url 'backweb:good_list' %}?type={{ type_id }}&context={{ context }}&page={{ page.number }}">{{ page.number }}</a>
+        {% if page.has_next == True %}
+        <a href="{% url 'backweb:good_list' %}?type={{ type_id }}&context={{ context }}&page={{ page.next_page_number }}">{{ page.next_page_number }}</a>
+        {% endif %}
+        {% if page.has_next == True %}
+        <a href="{% url 'backweb:good_list' %}?type={{ type_id }}&context={{ context }}&page={{ page.next_page_number}}" >下一页</a>
+        {% else %}
+            <a style="background-color:rgb(200,202,20)">下一页</a>
+        {% endif %}
+        <a href="{% url 'backweb:good_list' %}?type={{ type_id }}&context={{ context }}&page={{ page.paginator.num_pages }}">最后一页</a>
+        {% else %}
+
+
+        <a href="{% url 'backweb:good_list' %}?type={{ type_id }}&context={{ context }}&page=1">第一页</a>
+        {% if page.has_previous == True %}
+            <a href="{% url 'backweb:good_list' %}?type={{ type_id }}&context={{ context }}&page={{ page.previous_page_number}}">上一页</a>
+        {% else %}
+            <a style="background-color:rgb(200,202,20)">上一页</a>
+        {% endif %}
+        {% if page.has_previous == True %}
+            <a href="{% url 'backweb:good_list' %}?type={{ type_id }}&page={{ page.previous_page_number}}">{{ page.previous_page_number }}</a>
+        {% endif %}
+        <a href="{% url 'backweb:good_list' %}?type={{ type_id }}&page={{ page.number }}">{{ page.number }}</a>
+        {% if page.has_next == True %}
+        <a href="{% url 'backweb:good_list' %}?type={{ type_id }}&page={{ page.next_page_number }}">{{ page.next_page_number }}</a>
+        {% endif %}
+        {% if page.has_next == True %}
+        <a href="{% url 'backweb:good_list' %}?type={{ type_id }}&page={{ page.next_page_number}}" >下一页</a>
+        {% else %}
+            <a style="background-color:rgb(200,202,20)">下一页</a>
+        {% endif %}
+        <a href="{% url 'backweb:good_list' %}?type={{ type_id }}&page={{ page.paginator.num_pages }}">最后一页</a>
+        {% endif %}
+
+      </aside>
+ </div>
+</section>
+
+<script type="text/javascript">
+
+</script>
+<script type="text/javascript">
+
+    $('#t1 a').on('click',function(){
+    id = $(this).attr('class')
+    ta = $(this).text()
+    t = $(this)
+
+    $.ajax({
+        url:'/backweb/index/',
+        dataType:'json',
+        type:'POST',
+        data:{
+            'ta': ta,
+            'id':id
+        },
+        success:function(data){
+            console.log(data)
+             if (data.ta == '推荐'){
+                t.text('不推荐')
+            }else if (data.ta == '不推荐'){
+                t.text('推荐')
+            }
+        },
+    })
+})
+
+<!-- 点击类别跳转到则展示相应的分类 -->
+ $("#p_type").change(function(){
+    var type = $(this).val()
+    location.href = '/backweb/good_list/?type='+type
+ })
+
+<!-- 关键字查询 -->
+function select_goods(){
+    var context=$('#context').val()
+    var type = $('.select').val()
+
+    if (context){
+        location.href = '/backweb/good_list/?type='+type+'&context='+context
+    }else{
+        location.href = '/backweb/good_list/?type='+type
+    }
+
+
+}
+
+</script>
+{% endblock %}
+
