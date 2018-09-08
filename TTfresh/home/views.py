@@ -621,8 +621,7 @@ def delete_cart(request):
 
         else:
             del request.session[cart_id]
-            for key,val in request.session.items():
-                request[key] = val
+            request.session.modified = True
 
             return JsonResponse(data)
 

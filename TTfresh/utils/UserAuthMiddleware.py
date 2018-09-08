@@ -8,6 +8,8 @@ from user.models import User, UserStatus
 class MyMiddle(MiddlewareMixin):
 
     def process_request(self,request):
+        # 当访问页面时将过期的session数据清除
+        request.session.clear_expired()
         # 获取的地址不包含？后的参数
         path = request.path
         fg_list = ['/users/login/','/users/register/','/admin/','/backweb/login/',
