@@ -15,7 +15,7 @@ urlpatterns = [
     url(r'^add_product/',views.add_product,name='add_product'),
     # 减少商品
     url(r'^reduce_Cart/',views.reduce_Cart,name='reduce_Cart'),
-    # 添加订单
+    # 添加购物车
     url(r'^add_cart/',views.add_cart,name='add_cart'),
     # 购买
     # url(r'^buy/',views.buy,name='buy'),

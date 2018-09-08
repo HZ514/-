@@ -65,6 +65,12 @@ def login(request):
 
         # 检查状态表中是否已经有状态，如果已经有则替换原来的状态
         userticket = user.userstatus_set.all().first()
+
+        # request.session['cart'] = {'id':1,'home':2}
+        # request.session['cart1'] = {'id':1,'home':2}
+        #
+        # print(request.session)
+
         if userticket:
             userticket.ticket = ticket
             userticket.out_time = out_time
@@ -77,8 +83,8 @@ def login(request):
         res.set_cookie('ticket',ticket,expires=out_time)
         return res
 
-# 退出
 
+# 退出
 def logout(request):
     if request.method == 'GET':
         # 删除服务端的ticket值

@@ -19,7 +19,11 @@
     </div>
     <div class="guest_cart fr">
         <a href="{% url 'home:my_cart' %}" class="cart_name fl">我的购物车</a>
+        {% if user.id %}
         <div class="goods_count fl" id="show_count">{{ c_count }}</div>
+        {% else %}
+        <div class="goods_count fl" id="show_count">{{ c_count }}</div>
+        {% endif %}
     </div>
 </div>
 

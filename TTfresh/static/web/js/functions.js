@@ -60,7 +60,7 @@ function add_cart(good_id){
                 }
             },
         error:function(data){
-            alert('请求失败')
+
         }
     })
 }
@@ -110,7 +110,6 @@ function is_selcet(cart_id){
 }
 
 // 是否全选
-@csrf_exempt
 function all_select(){
     var csrf = $('input[name="csrfmiddlewaretoken"]').val()
     var is_all =  $('.is_all').prop("checked")
@@ -122,10 +121,9 @@ function all_select(){
         data:{'is_all':is_all},
         headers:{'X-CSRFToken':csrf},
         success:function(data){
-
                 if (data.f_is_all){
+                console.log(data.carts_id)
                     for (var i = 0; i < data.carts_id.length; i++){
-
                         $('.is_' + data.carts_id[i])[0].checked = true
                     }
 
@@ -133,6 +131,7 @@ function all_select(){
                 $('#moneys').html(data.moneys)
                 $('#all_count').text(data.all_count)
                 }else{
+                    console.log(data.carts_id)
                     for (var i = 0; i < data.carts_id.length; i++){
                         $('.is_' + data.carts_id[i])[0].checked = false
                     }
